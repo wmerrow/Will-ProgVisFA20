@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Will's Bar Chart</title>
+        <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
+        <style type="text/css">
+            /*TBD*/
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+                
+                const margin = 80; 
+                const width = 500; 
+                const height = 500;                
+
+                // // first promise returns the dataset as an array of objects
+                // const dataset = d3.csv("data.csv").then(function(data)
+                //     {return data;
+                //      console.log(data);
+                //     });
+                // //console.log(dataset);
+                
+                // //this promise returns an array of arrays
+                // const news = dataset.then(function(value) {
+                //    // for each
+                //    return Promise.all(value.map(function(results){
+                //    return {news_source: results.news_source, percent_main: results.percent_main};
+                //     }))});
+                // //console.log(news);
+
+                // //print the array
+                // news.then(function(data) {
+                //     return d3.select("body").append("p").text(data);});
+                
+
+                // const test = [ 
+                //              {"day": "Monday", "emails": "100"},
+                //              {"day": "Tuesday", "emails": "150"},
+                //              {"day": "Wednesday", "emails": "200"},
+                //              {"day": "Thursday", "emails": "250"},
+                //              {"day": "Friday", "emails": "300"},
+                //              {"day": "Saturday", "emails": "350"},
+                //              {"day": "Sunday", "emails": "400"}   
+                //             ];
+                // console.log(test);
+                // d3.select("body").append("p").text(test);
+
+                d3.csv("data.csv")
+                      .then(function(news) {
+
+                        //console.log(news);
+
+                        const maxX = d3.max(news, d => +d.percent_main);
+
+                        const xScale = d3.scaleLinear()
+                                        .domain([0, maxX]) 
+                                        .range([0, width - 2 * margin]);
+                        
+                        const yScale = d3.scaleBand()
+                                        .domain(news.map(d => d.news_source))
+                                        .range([height - margin, margin])
+                                        .paddingInner(.2) // this is how you make padding between the bars it is 2% of a bar's width
+                                        .paddingOuter(.2);
+                        
+                        const bottomAxis = d3.axisBottom()
+                                             .scale(xScale);
+                        const leftAxis = d3.axisLeft()
+                                           .scale(yScale);
+
+                        
+                        //Create our SVG element
+                       const svg = d3.select("body")
+                                    .append("svg")
+                                    .attr("width", width)
+                                    .attr("height", height);
+
+                        //Make bars and append data
+                        svg.selectAll("rect") 
+                            .data(news) 
+                            .enter()
+                            .append("rect")
+                            .attr("x", margin) //use scaled x and the data we want
+                            .attr("y", d => yScale(d.news_source)) //use scaled y and the data we want
+                            .attr("width", d => xScale(+d.percent_main)) //width of bars 
+                            .attr("height", yScale.bandwidth())
+                            .attr("fill", "orange");
+
+                        // //Implement bottom axis
+                        svg.append("g")
+                            .attr("transform", "translate(" + margin + "," + (height - margin) + ")") 
+                            .call(bottomAxis); 
+
+                        // //Implement left axis
+                         svg.append("g")
+                             .attr("transform", "translate(" + margin + ",0)")
+                             .call(leftAxis); 
+
+
+                      })
+                      .catch(function(error){
+                         // handle error   
+                      })
+
+
+            
+        </script>
+    </body>
+</html>
