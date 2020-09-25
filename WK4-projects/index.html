@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Will's Week 4 Assignment</title>
+        <script src= "https://d3js.org/d3.v6.js"></script>
+        <style type="text/css"> 
+        	svg{
+            width:1000px;
+            height:800px;
+          }
+
+          .title {
+            font-size: 16px;
+            font-weight: bold;
+            font-family: sans-serif;
+          }
+
+          .labels{
+            font-size: 14px;
+            font-weight: normal;
+            font-family: sans-serif;
+          }
+
+            
+        
+        </style>
+    </head>
+    <body>
+         <svg></svg> <!--Remember to add the svg here like this if you are applying it above-->
+
+        <script type="text/javascript">
+        
+        d3.csv("justices_2019.csv")
+             .then(function(justices) {
+
+        //Color using linear scale, d3 min and max 
+        // const maxData = d3.max(justices, d=>+d.ideology.replace(',', ''));
+        // const minData = d3.min(justices, d=>+d.ideology.replace(',', ''));
+        const maxData = 4;
+        const minData = -4;
+        const myColor = d3.scaleLinear()
+                          .domain([minData, maxData])
+                          .range(["blue", "red"]);
+        const xScale = d3.scaleLinear()
+                          .domain([minData, maxData])
+                          .range([100, 900]);
+
+        const bottomAxis = d3.axisBottom()
+                            .scale(xScale)
+    
+ 
+        //Drawn with d3.line()                 
+        const justiceGenerator = d3.line();
+        
+
+        //To draw the lines we are using an array to capture the path points. D3 uses the [x,y] of the array as x y for the path. 
+        const mt_points = [
+        [11,1],//This is the M point. The rest are Ls. 
+        [16,6],
+        [15,7],
+        [14,6],
+        [11,9],
+        [21,19],
+        [19,21],
+        [9,11],
+        [6,14],
+        [7,15],
+        [6,16],
+        [1,11],
+        [2,10],
+        [3,11],
+        [11,3],
+        [10,2],
+        [11,1]
+        ];
+
+        // [55,5],//This is the M point. The rest are Ls. 
+        // [80,30],
+        // [75,35],
+        // [70,30],
+        // [55,45],
+        // [105,95],
+        // [95,105],
+        // [45,55],
+        // [30,70],
+        // [35,75],
+        // [30,80],
+        // [5,55],
+        // [10,50],
+        // [15,55],
+        // [55,15],
+        // [50,10],
+        // [55,5]
+        // ];
+
+        const pathString = justiceGenerator(mt_points);
+        const row = justices.length; //in class we changed this to 3 to see what happens
+        const size = 20;
+
+        const svg = d3.select("svg");
+
+        //making groups
+        const g = svg.selectAll("g")
+                      .data(justices, d=>d)
+                      .enter()
+                      .append("g")
+                      .attr("transform", d=>{
+                        const x = xScale(+d.ideology.replace(',', ''));
+                        const y = 70;
+                        return 'translate(' + [x,y] + '), rotate(45)';})
+                      //.attr("transform", "rotate(45)")
+                      .attr("fill", d=> myColor(+d.ideology.replace(',', '')));
+                      // .attr("stroke", "#00441b")
+                      // .attr("stroke-width", "1px");
+
+        g.append("path")
+         .attr("d", pathString);
+
+        //Make Labels
+        g.append("text")
+          .attr("x", size/2 + 14) //x coordinate
+          .attr("y", size + 12) //y coordinate
+         // .attr("text-anchor", "left") //horizontal text alignment 
+         // .attr("transform", "rotate(45)")
+          .attr("dy", "5px") //y coordinate offset
+          .attr("class","labels")
+          .text(d=>d.justiceName); //the text 
+
+        // //Implement bottom axis
+        svg.append("g")
+            .attr("transform", "translate(0,175)") 
+            .call(bottomAxis); 
+
+        //Note the difference between svg.append text and g.append in this example. 
+        svg.append("text")
+           .attr("x", 500) //x coordinate
+           .attr("y", 40) //y coordinate
+           .attr("text-anchor", "middle") //horizontal 
+           .attr("class", "title")
+           .text("Ideology of Supreme Court Justices (2019 Term)"); //the text 
+
+        svg.append("text")
+           .attr("x", 90) //x coordinate
+           .attr("y", 210) //y coordinate
+           .attr("text-anchor", "start") //horizontal 
+           .attr("class", "labels")
+           .text("Liberal"); //the text 
+
+        svg.append("text")
+           .attr("x", 910) //x coordinate
+           .attr("y", 210) //y coordinate
+           .attr("text-anchor", "end") //horizontal 
+           .attr("class", "labels")
+           .text("Conservative"); //the text 
+        
+        })
+          .catch(function(error){
+                         // handle error   
+        })
+
+        </script>
+    </body>
+</html>
