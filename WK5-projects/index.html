@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <title>Will's Week 5 Assignment</title>
+      <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
+      <style type="text/css"> 
+
+      	svg{
+          width:800px;
+          height:800px;
+        }
+
+      </style>
+  </head>
+
+  <body>  
+    <svg></svg>
+    <script type="text/javascript">
+
+    d3.csv("map.csv")
+         .then(function(data) {
+
+          console.log(data);
+    
+      var options = {
+        rectWidth: 45,
+        rectHeight: 45
+      };
+
+      // Define color scale
+      var color = d3.scaleQuantize()
+        .domain([1, 20])
+        .range(['#b2ddf0', '#92bcd8', '#769cbf']);
+
+      var svg = d3.select('svg')
+        .attr('width', 12 * options.rectWidth)
+        .attr('height', 8 * options.rectHeight);
+
+      var sEnter = svg.append('g')
+        .selectAll('g')
+          .data(data)
+        .enter().append('g')
+          .attr('transform', function(d){return 'translate('+(d.col*options.rectWidth)+','+(d.row*options.rectHeight)+')';});
+
+      sEnter.append('rect')
+        .attr('width', options.rectWidth)
+        .attr('height', options.rectHeight)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .style('opacity', 0.5)
+        .style('stroke', '#ffffff')
+        .style('fill', function(d){return color(d.value);});
+
+      sEnter.append('text')
+        .attr('x', options.rectWidth/2)
+        .attr('y', options.rectHeight/2 + 2)
+        .style('text-anchor', 'middle')
+        .text(function(d){return d.code;});
+
+    
+    })
+        .catch(function(error){
+                       // handle error   
+    })
+
+      </script>
+  </body>
+</html>
