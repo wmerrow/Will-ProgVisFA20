@@ -6,62 +6,165 @@
       <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
       <style type="text/css"> 
 
-      	svg{
-          width:800px;
-          height:800px;
+      	svg {
+          width:1000px;
+          height:1000px;
+        }
+
+        .label {
+          font-family: Arial;
+          font-size: 13px;
+        }
+
+        body {
+          background: #000000;
+        }
+
+        h1 {
+          color: #eeeeee;
+          font-family: sans-serif;
+          padding-left: 50px;
+          font-weight: 200;
         }
 
       </style>
   </head>
 
   <body>  
+    
+    <h1>Which Senate races need your donation the most?</h1>
     <svg></svg>
     <script type="text/javascript">
 
     d3.csv("map.csv")
          .then(function(data) {
 
-          console.log(data);
-    
-      var options = {
-        rectWidth: 45,
-        rectHeight: 45
+          //console.log(data);
+      
+      // margins
+      const margin = {
+        top: 0,
+        left: 50
       };
 
-      // Define color scale
-      var color = d3.scaleQuantize()
-        .domain([1, 20])
-        .range(['#b2ddf0', '#92bcd8', '#769cbf']);
+      // Dimensions of state squares
+      const square = {
+        w: 70,
+        h: 70
+      };
 
-      var svg = d3.select('svg')
-        .attr('width', 12 * options.rectWidth)
-        .attr('height', 8 * options.rectHeight);
+      // color scale for 2020 leaning
+      // const lean = d3.scaleOrdinal()
+      //   .domain(["Not up for reelection", "Solid D", "Likely D", "Lean D", "Toss up", "Lean R", "Likely R", "Solid R"])
+      //   .range(['#222222', '#4393c3','#92c5de','#d1e5f0','f7f7f7','#fddbc7','#f4a582','#d6604d']);
+      const lean = d3.scaleOrdinal()
+        .domain(["Not up for reelection", "Solid D", "Likely D", "Lean D", "Toss up", "Lean R", "Likely R", "Solid R"])
+        .range(['#222222', '#2166ac','#4393c3','#92c5de','ffffe0','#f4a582','#d6604d','#b2182b']);
 
-      var sEnter = svg.append('g')
+      // color scale for current control
+      const control = d3.scaleOrdinal()
+        .domain(["Democrat", "Republican", "Independent"])
+        .range(['#2166ac', '#b2182b', '#2166ac']);
+
+      // opacity scale for competitiveness
+      // const competition = d3.scaleOrdinal()
+      //   .domain(["Not up for reelection", "Solid D", "Likely D", "Lean D", "Toss up", "Lean R", "Likely R", "Solid R"])
+      //   .range([0.25, 0.25, 0.5, 0.75, 1, 0.75, 0.7, 0.25]);
+      
+      // scale for label color
+      const compColor = d3.scaleOrdinal()
+        .domain(["Not up for reelection", "Solid D", "Likely D", "Lean D", "Toss up", "Lean R", "Likely R", "Solid R"])
+        .range(['#555555', '#555555', '#eeeeee', '#eeeeee', '#eeeeee', '#eeeeee', '#eeeeee', '#555555']);
+
+      // opacity scale
+      const compOpacity = d3.scaleOrdinal()
+        .domain(["Not up for reelection", "Solid D", "Likely D", "Lean D", "Toss up", "Lean R", "Likely R", "Solid R"])
+        .range([0.3, 0.3, 1, 1, 1, 1, 1, 0.3]);
+
+      // smallest radius
+      const rSize = 7.5;
+
+      // size scale
+      // const size = d3.scaleOrdinal()
+      //   .domain(["Not up for reelection", "Safe or likely safe", "Lean", "Toss up"])
+      //   .range([rSize, rSize + 3, rSize + 6, rSize + 9]);
+
+      // SVG dimensions
+      const svg = d3.select('svg')
+        .attr('width', 12 * square.w)
+        .attr('height', 8 * square.h);
+
+      // add gs
+      const g = svg.append('g')
         .selectAll('g')
-          .data(data)
-        .enter().append('g')
-          .attr('transform', function(d){return 'translate('+(d.col*options.rectWidth)+','+(d.row*options.rectHeight)+')';});
+        .data(data)
+        .enter()
+        .append('g')
+        .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';});
 
-      sEnter.append('rect')
-        .attr('width', options.rectWidth)
-        .attr('height', options.rectHeight)
+      // draw squares
+      g.append('rect')
+        .attr('width', square.w)
+        .attr('height', square.h)
         .attr('vector-effect', 'non-scaling-stroke')
-        .style('opacity', 0.5)
-        .style('stroke', '#ffffff')
-        .style('fill', function(d){return color(d.value);});
+        .style('stroke', '#000000')
+        .style('stroke-width', '3px')
+        .style('fill', '#222222');
+        //.style('fill', d=>{return lean(d.value);});
 
-      sEnter.append('text')
-        .attr('x', options.rectWidth/2)
-        .attr('y', options.rectHeight/2 + 2)
+      // draw labels
+      g.append('text')
+        .attr('x', square.w / 2)
+        .attr('y', square.h / 2 + 2)
         .style('text-anchor', 'middle')
-        .text(function(d){return d.code;});
+        .attr('class', 'label')
+        .attr('transform', 'translate(0,-15)')
+        .style('fill', d=> {return compColor(d.s1_lean)})
+        .text(d=>{return d.code;});
+
+      // draw first senator circles
+      g.append('circle')
+        .attr('cx', square.w / 2)
+        .attr('cy', square.h / 2 + 2)
+        .attr('r', rSize)//d=> {return size(d.s2_lean)})
+        .attr('transform', 'translate(12, 5)')
+       .style('fill', d=> {return lean(d.s2_lean)})
+       .style('stroke', d=> {if (d.s2_lean === 'Not up for reelection') {return control(d.s2_control);} else {return lean(d.s2_lean);}})
+        // .style('fill', d=> {if (d.s2_lean === 'Not up for reelection') {return control(d.s2_control);} else {return '#222222'}})
+        // .style('stroke', d=> {if (d.s2_lean === 'Not up for reelection') {return '#222222';} else {return lean(d.s2_lean);}})
+        .style('opacity', d=> {return compOpacity(d.s2_lean)})
+        .style('stroke-width', 1.5);
+
+      // draw second senator circles
+      g.append('circle')
+        .attr('cx', square.w / 2)
+        .attr('cy', square.h / 2 + 2)
+        .attr('r', rSize)//d=> {return size(d.s1_lean)})
+        .attr('transform', 'translate(-12, 5)')
+       .style('fill', d=> {return lean(d.s1_lean)})
+       .style('stroke', d=> {if (d.s1_lean === 'Not up for reelection') {return control(d.s1_control);} else {return lean(d.s1_lean);}})
+        // .style('fill', d=> {if (d.s1_lean === 'Not up for reelection') {return control(d.s1_control);} else {return '#222222'}})
+        // .style('stroke', d=> {if (d.s1_lean === 'Not up for reelection') {return '#222222';} else {return lean(d.s1_lean);}})
+        .style('opacity', d=> {return compOpacity(d.s1_lean)})
+        .style('stroke-width', 1.5);
+
+      // legend
+      const legend = svg.append('g')
+        .selectAll('circle')
+        .data(["Solid D", "Likely D", "Lean D", "Toss up", "Lean R", "Likely R", "Solid R"])
+        .enter()
+        .append('circle')
+        .attr('cx', i=> {return i*10})
+        .attr('cy', 10)
+        .attr('r', rSize)
+        .attr('fill', '#dddddd');
+
 
     
     })
         .catch(function(error){
                        // handle error   
-    })
+    });
 
       </script>
   </body>
