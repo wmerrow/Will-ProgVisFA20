@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Force Network Graph Example</title>
+        <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
+        <style type="text/css">
+          /**/
+
+        </style>
+    </head>
+    <body>
+        <svg width="600" height="600"></svg>
+        <script type="text/javascript">
+           
+            //Everything we are familiar with:
+            const svg = d3.select("svg");
+            const w = 600;
+            const h= 600; 
+            const myColor = d3.scaleOrdinal(d3.schemeTableau10);
+
+            //Our dataset {} has two [] one for nodes one for links (or edges) -- note the difference in formatting
+            //our edges [] contains a source and target. these are the ids from the nodes []
+            const dataset = {
+            nodes: [
+              {id:0, name:"Oliver"},
+              {id:1, name:"Charlotte"},
+              {id:2, name:"Ava"},
+              {id:3, name:"Liam"},
+              {id:4, name:"Ethan"},
+              {id:5, name:"Amelia"},
+              {id:6, name:"Gabriel"},
+              {id:7, name:"Olivia"},
+              {id:8, name:"Caleb"},
+              {id:9, name:"Violet"}
+              ],
+            links: [
+              {source: 0, target: 1, weight: 5},
+              {source: 1, target: 9, weight: 5},
+              {source: 1, target: 2, weight: 5},
+              {source: 2, target: 8, weight: 3},
+              {source: 2, target: 0, weight: 5},
+              {source: 1, target: 7, weight: 7},
+              {source: 3, target: 2, weight: 2},
+              {source: 4, target: 3, weight: 2},
+              {source: 4, target: 6, weight: 5},
+              {source: 5, target: 9, weight: 3},
+              {source: 5, target: 8, weight: 8},
+              {source: 5, target: 1, weight: 9},
+              {source: 6, target: 7, weight: 10},
+              {source: 7, target: 3, weight: 1},
+              {source: 7, target: 9, weight: 1},
+              {source: 8, target: 4, weight: 2},
+              {source: 8, target: 0, weight: 1},
+              {source: 9, target: 0, weight: 5}
+              ]
+            };
+
+            console.log(dataset);
+
+            //our force simulation
+            //comment out these .force() one at a time to see how it changes
+            const simulation = d3.forceSimulation(dataset.nodes)
+                                //.force("charge", d3.forceManyBody())
+                                //.force("charge", d3.forceManyBody().strength(-10))
+                                .force("charge", d3.forceManyBody().strength(-500))
+                                .force("link", d3.forceLink(dataset.links))
+                                //.force("link", d3.forceLink(dataset.links).distance(50))
+                                //.force("link", d3.forceLink(dataset.links).distance(200)) 
+                                .force("center", d3.forceCenter().x(w/2).y(h/2));
+                                //.force("center", d3.forceCenter().x(w/4).y(h/4));
+                                //.force("center", d3.forceCenter().x(100).y(500));
+                                //.force("center", d3.forceCenter(500,500));
+                                //.force("x", d3.forceX().x(100))
+                                //.force("y", d3.forceY().y(500));
+
+            //our links (lines)
+            const links = svg.selectAll("line")
+                             .data(dataset.links)
+                             .enter()
+                             .append("line")
+                             .style("stroke", "black")
+                             .style("stroke-width", 1);
+                             //.style("stroke-width", d=> d.weight *2); //could be set to data /connection strength 
+
+            //our nodes (circles) come after our links on the SVG
+            const nodes = svg.selectAll("circle")
+                             .data(dataset.nodes)
+                             .enter()
+                             .append("circle")
+                             .attr("r", 7) //could be set to data as we've done
+                             .style("fill", (d,i)=>myColor(i));
+
+            //force ticks: remember our links are lines and nodes are circles, which have specific params.
+            simulation.on("tick", (event,d)=>{
+              
+              links.attr("x1", d=>d.source.x)
+                   .attr("y1", d=>d.source.y)
+                   .attr("x2", d=>d.target.x)
+                   .attr("y2", d=>d.target.y);
+
+              nodes.attr("cx", d=>d.x)
+                   .attr("cy", d=>d.y);
+            
+            });
+
+            console.log(dataset.nodes);
+
+            
+
+
+        </script>
+    </body>
+</html>

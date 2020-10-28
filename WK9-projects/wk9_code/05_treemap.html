@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Treemap</title>
+        <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
+        <style type="text/css">
+          
+        svg{
+        	background-color: #F1F0EA
+        }
+          .rects{
+          	stroke: #230903;
+          }
+
+          .labels{
+          	font-family: sans-serif;
+          	fill: white;
+          	font-size: .71em;
+          	font-weight: 550;
+          }
+
+          .values{
+          	font-family: sans-serif;
+          	fill: white;
+          	font-size: .71em;
+          	font-weight: 500;
+          }
+
+          .titles{
+          	font-family: sans-serif;
+          	fill: #230903;
+          	font-size: 1em;
+          	font-weight: 550;
+          }
+          /*#chart {
+          	height: 600px;
+            width: 600px;
+          }*/
+          
+
+        </style>
+    </head>
+    <body>
+    	<div id= "chart"></div>
+        <script type="text/javascript">
+           
+            //Everything we are familiar with:
+            const w = 600;
+            const h= 600;
+            const svg = d3.select("#chart")
+            			        .append("svg")
+                          .attr("width", w)
+                          .attr("height", h)
+            			        //.attr("viewBox", "0 0 600 600") //alternatively, viewBox
+                          .append("g");
+                    
+            const myColor = d3.scaleOrdinal()
+            				  .domain(["Crytopgamae","Phanerogame"])
+            				  .range(["#084C61","#E3B505"]);
+
+            const opacity = d3.scaleLinear()
+            				  .domain([1, 12])
+            				  .range([.5, 1]);
+ 
+
+            //Our hierarchical dataset (with values!!)
+            const dataset = {
+                    id: "Plant Kingom", 
+                    children: [
+                      {id: "Crytopgamae", 
+                       children: [
+                        {id: "Thallophta", 
+                         children: [
+                          {id: "Algae", "value": 7},
+                          {id: "Fungai", "value": 8},
+                          {id: "Lichens","value": 12},
+                         ]
+                        },
+                        {id: "Bryophyta", "value": 3},
+                        {id: "Pteridophyta", "value": 4}
+                       ]
+                      },
+                      {id: "Phanerogame", 
+                       children: [
+                        {id: "Gymnospermae", "value": 9},
+                        {id: "Angiospermae", 
+                         children: [
+                          {id: "Monocot", "value": 1},
+                          {id: "Dicot", "value": 2}
+                         ]
+                        }
+                       ]
+                      }
+                    ]
+                  };
+
+            //our two requirements here are d3.treemap() and d3.hierarchy()
+          
+            //treemap layout
+            //the different paddings can be applied to adjust the layout--the layout will be totally different based on how these are applied!  
+            const treemap = d3.treemap()
+                           	  .size([w-30, h-30])
+                           	  //.tile(d3.treemapSquarify);
+                           	   //.tile(d3.treemapBinary);
+                           	  //.tile(d3.treemapDice);
+                           	   //.tile(d3.treemapSlice);
+                           	   //.tile(d3.treemapSliceDice);
+                           	  .paddingTop(15) 
+                           	  .paddingLeft(4)
+                           	  .paddingInner(4);
+
+                           	  //other available paddings for .treemap()
+                           	  //.paddingRight(2)
+                           	  //.paddingBottom(2)
+                           	  //.paddingOuter(10)
+                              //.padding(2) 
+            
+            
+            //dataset to treemap data
+            //root.sum is *required* before treemap(root): sets a value on each node to sum of its children)
+            const root = d3.hierarchy(dataset)
+            			         .sum(d=>d.value);
+                     
+            
+            treemap(root); //writing x/y vals for each node! -- treemap data!
+            
+            //let's look at root
+            console.log(root);
+
+            //our treemap rects
+		      svg.selectAll("rect")
+  	         .data(root.leaves())
+  	         .enter()
+  	         .append("rect")
+  	         .attr("class", "rects")
+  	         .attr("x", d=> d.x0)
+  	         .attr("y", d=> d.y0)
+  	         .attr("width", d=> d.x1 - d.x0)
+  	         .attr("height", d=> d.y1 - d.y0)
+  	         .style("fill", d=> myColor(d.parent.data.id))
+  	         .style("opacity", d=> opacity(d.data.value));
+
+	        //our name labels
+	      svg.selectAll(".labels")
+	         .data(root.leaves())
+	         .enter()
+	         .append("text")
+	         .attr("class", "labels")
+	         .attr("x", d=> d.x0 +5)
+	         .attr("y", d=> d.y0 +20)
+	         .text(d=>d.data.id);
+
+	     	//our value labels (#s)
+        svg.selectAll(".values")
+            .data(root.leaves())
+            .enter()
+            .append("text")
+            .attr("class", "values")
+            .attr("x", d=> d.x0+5) 
+            .attr("y", d=> d.y0+33)
+            .text(d=> d.data.value);
+
+        //our two subgroup titles
+        svg.selectAll(".titles")
+           .data(root.descendants().filter(d=>d.depth==1))
+           .enter()
+           .append("text")
+           .attr("class", "titles")
+           .attr("x", d=>d.x0 + 10)
+           .attr("y", d=>d.y0 + 10)
+           .text(d=>d.data.id);
+                        
+
+        </script>
+    </body>
+</html>

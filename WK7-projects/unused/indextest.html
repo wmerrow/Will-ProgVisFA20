@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <title>Will's Week 7 Assignment</title>
+      <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
+      <style type="text/css"> 
+
+      	svg {
+          width:1000px;
+          height:1000px;
+        }
+
+        .label {
+          font-family: Arial;
+          font-size: 13px;
+        }
+
+        body {
+          background: #000000;
+        }
+
+        h1 {
+          color: #eeeeee;
+          font-family: sans-serif;
+          padding-left: 50px;
+          font-weight: 200;
+        }
+
+      </style>
+  </head>
+
+  <body>  
+    
+    <h1>How the Senate has changed over time</h1>
+    <div id="container">
+        <select>
+          <option>test</option>
+          <option>test2</option>
+          <option>test3</option>
+        </select>
+    </div>
+    <svg></svg>
+    <script type="text/javascript">
+
+    d3.csv("map.csv")
+         .then(function(data) {
+
+          //console.log(data);
+      
+      // margins
+      const margin = {
+        top: 100,
+        left: 50
+      };
+
+      // Dimensions of state squares
+      const square = {
+        w: 70,
+        h: 70
+      };
+
+      // category values for easier reference
+      const values = ["Democrat", "Independent", "Republican"]
+
+      // scale for setting color based on leaning
+      const color = d3.scaleOrdinal()
+        .domain(values)
+        .range(['#2166ac', '#2166ac', '#680000']);
+      
+      // radius
+      const rSize = 7.5;
+
+      // SVG dimensions
+      const svg = d3.select('svg')
+        .attr('width', 12 * square.w)
+        .attr('height', 8 * square.h);
+
+      // add g for each state in appropriate position
+      const g = svg.append('g')
+        .selectAll('g')
+        .data(data)
+        .enter()
+        .append('g')
+        .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';});
+
+      // squares
+      g.append('rect')
+        .attr('width', square.w)
+        .attr('height', square.h)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .style('stroke', '#000000')
+        .style('stroke-width', '3px')
+        .style('fill', '#191919');
+
+      // labels
+      g.append('text')
+        .attr('x', square.w / 2)
+        .attr('y', square.h / 2 + 2)
+        .style('text-anchor', 'middle')
+        .attr('class', 'label')
+        .attr('transform', 'translate(0,-15)')
+        .style('fill', '#555555')
+        .text(d=> {return d.code;});
+
+      // first senator circles
+      g.append('circle')
+        .attr('cx', square.w / 2)
+        .attr('cy', square.h / 2 + 2)
+        .attr('r', rSize)
+        .attr('transform', 'translate(-12, 5)')
+        .style('fill', d=> {return color(d.s1_control_116);});
+
+      // second senator circles
+      g.append('circle')
+        .attr('cx', square.w / 2)
+        .attr('cy', square.h / 2 + 2)
+        .attr('r', rSize)
+        .attr('transform', 'translate(12, 5)')
+        .style('fill', d=> {return color(d.s2_control_116);});
+
+      // const legendSpacing = 61
+
+      // // legend circles
+      // svg.append('g')
+      //   .selectAll('circle')
+      //   .data(values) // uses values defined above (instead of CSV)
+      //   .enter()
+      //   .append('circle')
+      //   .attr('cx', (d,i)=> {return i * legendSpacing + margin.left + rSize + 12})
+      //   .attr('cy', 50)
+      //   .attr('r', rSize)
+      //   .style('stroke', d=> {return leanColor(d)})
+      //   .style('fill', d=> {if (d === 'D not up for reelection' || d === 'R not up for reelection') {return '#191919';} else {return leanColor(d);}}) // if statement changes fill to dark gray if not up for reelection
+      //   .style('opacity', d=> {return leanOpacity(d)})
+      //   .style('stroke-width', 1.5);
+
+      // // legend text
+      // svg.append('g')
+      //   .selectAll('text')
+      //   .data(values)
+      //   .enter()
+      //   .append('text')
+      //   .style('text-anchor', 'middle')
+      //   .attr('x', (d,i)=> {return i * legendSpacing + margin.left + rSize + 12})
+      //   .attr('y', 33)
+      //   .text(d=> {if (d === 'D not up for reelection' || d === 'R not up for reelection') {return 'No race';} else {return d;}}) // change text to "No race" if not up for reelection
+      //   .attr('class', 'label')
+      //   .style('fill', '#ffffff')
+      //   .attr('opacity', d=> {return leanOpacity(d)});
+
+    
+    })
+        .catch(function(error){
+                       // handle error   
+    });
+
+      </script>
+  </body>
+</html>

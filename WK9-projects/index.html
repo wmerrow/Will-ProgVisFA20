@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Treemap</title>
+        <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
+        <style type="text/css">
+
+          h1{
+            font-family: sans-serif;
+            color: #230903;
+            font-size: 24px;
+            margin-left: 23px;
+            margin-bottom: 0px;
+          }
+
+          h3{
+            font-family: sans-serif;
+            color: #777777;
+            font-size: 14px;
+            margin-left: 23px;
+            margin-top: 5px;
+            margin-bottom: 0px;
+            font-weight: normal;
+          }
+
+          #tooltip{
+            position: absolute;
+            width: 100px;
+            height: 30px;
+            padding: 10px;
+            font-family:sans-serif;
+            font-size: 12px;
+            font-weight: 550;
+            background: white;
+          }
+
+          .rects{
+          	stroke: #230903;
+          }
+
+          .labels{
+          	font-family: sans-serif;
+            fill: #230903;
+          	font-size: .71em;
+          	font-weight: 550;
+          }
+
+          .values{
+          	font-family: sans-serif;
+            fill: #230903;
+          	font-size: .71em;
+          	font-weight: 500;
+          }
+
+          .titles{
+          	font-family: sans-serif;
+          	fill: #230903;
+          	font-size: .77em;
+          	font-weight: 550;
+          }
+          /*#chart {
+          	height: 600px;
+            width: 600px;
+          }*/
+          
+
+        </style>
+    </head>
+    <body>
+      <h1>Projected World Population in 2100</h1>
+      <!-- <h3>Projected population, medium fertility variant</h3> -->
+    	<div id= "chart"></div>
+        <script type="text/javascript">
+           
+            const w = 1050;
+            const h= 750;
+
+            const tooltip =d3.select("body")
+                         .append("div")
+                         .attr("id", "tooltip")
+                         .style("opacity", 0);
+
+            const svg = d3.select("#chart")
+            			        .append("svg")
+                          .attr("width", w)
+                          .attr("height", h)
+            			        //.attr("viewBox", "0 0 600 600") //alternatively, viewBox
+                          .append("g");
+                    
+            const myColor = d3.scaleOrdinal()
+            				  .domain(["Sub-Saharan Africa", "North Africa and West Asia", "Central and Southern Asia", "East and South-East Asia and Oceania", "Latin America and Caribbean", "Europe and N. America"])
+            				  //.range(['#8dd3c7','#eeeeee','#eeeeee','#eeeeee','#eeeeee','#eeeeee']);
+                      .range(['#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462']);
+            
+
+            d3.json("data/un_data_simple.json")
+              .then(function(dataset) {
+
+              //console.log(dataset);
+
+              //our two requirements here are d3.treemap() and d3.hierarchy()
+            
+              //treemap layout
+              //the different paddings can be applied to adjust the layout--the layout will be totally different based on how these are applied!  
+              const treemap = d3.treemap()
+                             	  .size([w-30, h-30])
+                             	  //.tile(d3.treemapSquarify);
+                             	   //.tile(d3.treemapBinary);
+                             	  //.tile(d3.treemapDice);
+                             	   //.tile(d3.treemapSlice);
+                             	   //.tile(d3.treemapSliceDice);
+                             	  .paddingTop(26)
+                             	  .paddingLeft(10);
+                             	  // .paddingInner(4);
+
+                             	  //other available paddings for .treemap()
+                             	  //.paddingRight(2)
+                             	  //.paddingBottom(2)
+                             	  //.paddingOuter(10)
+                                //.padding(2) 
+              
+              
+              //dataset to treemap data
+              //root.sum is *required* before treemap(root): sets a value on each node to sum of its children)
+              const root = d3.hierarchy(dataset)
+              			         .sum(d=>d.pop_2100).sort((a, b) => 
+                d3.descending(a.value, b.value));
+                       
+              
+              treemap(root); //writing x/y vals for each node! -- treemap data!
+              
+              //console.log(root);
+
+              //our treemap rects
+  		        svg.selectAll("rect")
+    	         .data(root.leaves())
+    	         .enter()
+    	         .append("rect")
+    	         .attr("class", "rects")
+    	         .attr("x", d=> d.x0)
+    	         .attr("y", d=> d.y0)
+    	         .attr("width", d=> d.x1 - d.x0)
+    	         .attr("height", d=> d.y1 - d.y0)
+    	         .style("fill", d=> myColor(d.parent.data.id))
+               .on("mouseover", (event, d)=> {
+                 d3.select("#tooltip")
+                   .transition()
+                   .duration(300)
+                   .style("opacity", 0.9)
+                   .style("left", (event.pageX + 2) + "px")
+                   .style("top", (event.pageY + 2) + "px")
+                   .text(d.data.id + d.data.pop_2100);
+                })     
+               .on("mouseout", (event, d)=>{
+                 d3.select("#tooltip")
+                  .transition()
+                  .style("opacity", 0);
+                })
+               .on("mousemove", (event, d) =>{
+                 d3.select("#tooltip")
+                  .style("left", (event.pageX + 2) + "px")
+                  .style("top", (event.pageY + 2) + "px")
+               });
+
+    	        //country labels
+    	        svg.selectAll(".labels")
+    	         .data(root.leaves())
+    	         .enter()
+    	         .append("text")
+    	         .attr("class", "labels")
+    	         .attr("x", d=> d.x0 +5)
+    	         .attr("y", d=> d.y0 +15)
+               // add text if rectangle is large enough
+    	         .text(d=> {if ((d.y1 - d.y0) > 30 && (d.x1 - d.x0) > 60 && (d.data.pop_2100 > 100000)) {
+                  return d.data.id;
+                }});
+
+    	     	  //values (#s)
+              svg.selectAll(".values")
+                .data(root.leaves())
+                .enter()
+                .append("text")
+                .attr("class", "values")
+                .attr("x", d=> d.x0+5) 
+                .attr("y", d=> d.y0+29)
+               // add text if rectangle is large enough
+                .text(d=> {if ((d.y1 - d.y0) > 30 && (d.x1 - d.x0) > 60 && (d.data.pop_2100 > 100000)) {
+                  return d3.format(".3s")(d.data.pop_2100*1000).replace(/G/,"B"); //multiply by 1000 because data in 1000s, replace G with B for billions
+                }});
+
+              //region titles
+              svg.selectAll(".titles")
+               .data(root.descendants().filter(d=>d.depth==1))
+               .enter()
+               .append("text")
+               .attr("class", "titles")
+               .attr("x", d=>d.x0 + 10)
+               .attr("y", d=>d.y0 + 19)
+               .text(d=>d.data.id);
+
+
+            })
+            .catch(function(error){
+                           // handle error   
+            });
+
+        </script>
+    </body>
+</html>
