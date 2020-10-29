@@ -14,25 +14,18 @@
             margin-bottom: 0px;
           }
 
-          h3{
-            font-family: sans-serif;
-            color: #777777;
-            font-size: 14px;
-            margin-left: 23px;
-            margin-top: 5px;
-            margin-bottom: 0px;
-            font-weight: normal;
-          }
-
-          #tooltip{
+          #tooltipLabel{
             position: absolute;
-            width: 100px;
-            height: 30px;
-            padding: 10px;
             font-family:sans-serif;
             font-size: 12px;
             font-weight: 550;
-            background: white;
+          }
+
+          #tooltipValue{
+            position: absolute;
+            font-family:sans-serif;
+            font-size: 12px;
+            font-weight: normal;
           }
 
           .rects{
@@ -58,27 +51,26 @@
           	fill: #230903;
           	font-size: .77em;
           	font-weight: 550;
-          }
-          /*#chart {
-          	height: 600px;
-            width: 600px;
-          }*/
-          
+          }          
 
         </style>
     </head>
     <body>
       <h1>Projected World Population in 2100</h1>
-      <!-- <h3>Projected population, medium fertility variant</h3> -->
     	<div id= "chart"></div>
         <script type="text/javascript">
            
             const w = 1050;
             const h= 750;
 
-            const tooltip =d3.select("body")
-                         .append("div")
-                         .attr("id", "tooltip")
+            const tooltipLabel =d3.select("body")
+                         .append("p")
+                         .attr("id", "tooltipLabel")
+                         .style("opacity", 0);
+
+            const tooltipValue =d3.select("body")
+                         .append("p")
+                         .attr("id", "tooltipValue")
                          .style("opacity", 0);
 
             const svg = d3.select("#chart")
@@ -102,7 +94,6 @@
               //our two requirements here are d3.treemap() and d3.hierarchy()
             
               //treemap layout
-              //the different paddings can be applied to adjust the layout--the layout will be totally different based on how these are applied!  
               const treemap = d3.treemap()
                              	  .size([w-30, h-30])
                              	  //.tile(d3.treemapSquarify);
@@ -143,24 +134,38 @@
     	         .attr("width", d=> d.x1 - d.x0)
     	         .attr("height", d=> d.y1 - d.y0)
     	         .style("fill", d=> myColor(d.parent.data.id))
-               .on("mouseover", (event, d)=> {
-                 d3.select("#tooltip")
-                   .transition()
-                   .duration(300)
+               .style("opacity", 0.65)
+               // for some reason "=>" syntax doesn't work with "this" so need to write out "function"
+               .on("mouseover", function(event, d) { 
+                d3.select(this)
+                   .style("opacity", 1);
+                d3.select("#tooltipLabel")
                    .style("opacity", 0.9)
-                   .style("left", (event.pageX + 2) + "px")
+                   .style("left", (event.pageX + 12) + "px")
                    .style("top", (event.pageY + 2) + "px")
-                   .text(d.data.id + d.data.pop_2100);
+                   .text(d.data.id);
+                 d3.select("#tooltipValue")
+                   .style("opacity", 0.9)
+                   .style("left", (event.pageX + 12) + "px")
+                   .style("top", (event.pageY + 17) + "px")
+                   .text(d3.format(".3s")(d.data.pop_2100*1000).replace(/G/,"B")); //multiply by 1000 because data in 1000s, replace G with B for billions
                 })     
-               .on("mouseout", (event, d)=>{
-                 d3.select("#tooltip")
-                  .transition()
+               // for some reason "=>" syntax doesn't work with "this" so need to write out "function"
+               .on("mouseout", function(event, d) { 
+                d3.select(this)
+                   .style("opacity", 0.65);
+                 d3.select("#tooltipLabel")
+                  .style("opacity", 0);
+                 d3.select("#tooltipValue")
                   .style("opacity", 0);
                 })
                .on("mousemove", (event, d) =>{
-                 d3.select("#tooltip")
-                  .style("left", (event.pageX + 2) + "px")
+                 d3.select("#tooltipLabel")
+                  .style("left", (event.pageX + 12) + "px")
                   .style("top", (event.pageY + 2) + "px")
+                 d3.select("#tooltipValue")
+                  .style("left", (event.pageX + 12) + "px")
+                  .style("top", (event.pageY + 17) + "px")
                });
 
     	        //country labels
