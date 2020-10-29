@@ -21,11 +21,27 @@
             font-weight: 550;
           }
 
+          #tooltipLabelHalo{
+            position: absolute;
+            font-family:sans-serif;
+            font-size: 12px;
+            font-weight: 550;
+            -webkit-text-stroke: 3px white;
+          }
+
           #tooltipValue{
             position: absolute;
             font-family:sans-serif;
             font-size: 12px;
             font-weight: normal;
+          }
+
+          #tooltipValueHalo{
+            position: absolute;
+            font-family:sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+            -webkit-text-stroke: 3px white;
           }
 
           .rects{
@@ -49,7 +65,7 @@
           .titles{
           	font-family: sans-serif;
           	fill: #230903;
-          	font-size: .77em;
+          	font-size: .8em;
           	font-weight: 550;
           }          
 
@@ -63,15 +79,29 @@
             const w = 1050;
             const h= 750;
 
-            const tooltipLabel =d3.select("body")
-                         .append("p")
-                         .attr("id", "tooltipLabel")
+            const tooltip =d3.select("body")
+                         .append("div")
+                         .attr("id", "tooltip")
                          .style("opacity", 0);
 
-            const tooltipValue =d3.select("body")
+            // append <p> elements for each line of tooltip text
+            // Halos have thick white stroke to give the effect of outer stroke, since outer stroke is not possible with CSS
+            //IDs could be consolidated to classes in the future
+            const tooltipLabelHalo =d3.select("#tooltip")
                          .append("p")
-                         .attr("id", "tooltipValue")
-                         .style("opacity", 0);
+                         .attr("id", "tooltipLabelHalo");
+
+            const tooltipLabel =d3.select("#tooltip")
+                         .append("p")
+                         .attr("id", "tooltipLabel");
+
+            const tooltipValueHalo =d3.select("#tooltip")
+                         .append("p")
+                         .attr("id", "tooltipValueHalo");
+
+            const tooltipValue =d3.select("#tooltip")
+                         .append("p")
+                         .attr("id", "tooltipValue");
 
             const svg = d3.select("#chart")
             			        .append("svg")
@@ -82,7 +112,6 @@
                     
             const myColor = d3.scaleOrdinal()
             				  .domain(["Sub-Saharan Africa", "North Africa and West Asia", "Central and Southern Asia", "East and South-East Asia and Oceania", "Latin America and Caribbean", "Europe and N. America"])
-            				  //.range(['#8dd3c7','#eeeeee','#eeeeee','#eeeeee','#eeeeee','#eeeeee']);
                       .range(['#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462']);
             
 
@@ -134,38 +163,44 @@
     	         .attr("width", d=> d.x1 - d.x0)
     	         .attr("height", d=> d.y1 - d.y0)
     	         .style("fill", d=> myColor(d.parent.data.id))
-               .style("opacity", 0.65)
+               .style("opacity", 0.55)
                // for some reason "=>" syntax doesn't work with "this" so need to write out "function"
                .on("mouseover", function(event, d) { 
                 d3.select(this)
                    .style("opacity", 1);
-                d3.select("#tooltipLabel")
+                d3.select("#tooltip")
                    .style("opacity", 0.9)
                    .style("left", (event.pageX + 12) + "px")
                    .style("top", (event.pageY + 2) + "px")
+                d3.select("#tooltipLabelHalo")
                    .text(d.data.id);
-                 d3.select("#tooltipValue")
-                   .style("opacity", 0.9)
-                   .style("left", (event.pageX + 12) + "px")
-                   .style("top", (event.pageY + 17) + "px")
+                d3.select("#tooltipLabel")
+                   .text(d.data.id);
+                d3.select("#tooltipValueHalo")
+                   .text(d3.format(".3s")(d.data.pop_2100*1000).replace(/G/,"B")); //multiply by 1000 because data in 1000s, replace G with B for billions
+                d3.select("#tooltipValue")
                    .text(d3.format(".3s")(d.data.pop_2100*1000).replace(/G/,"B")); //multiply by 1000 because data in 1000s, replace G with B for billions
                 })     
                // for some reason "=>" syntax doesn't work with "this" so need to write out "function"
                .on("mouseout", function(event, d) { 
                 d3.select(this)
-                   .style("opacity", 0.65);
-                 d3.select("#tooltipLabel")
-                  .style("opacity", 0);
-                 d3.select("#tooltipValue")
+                   .style("opacity", 0.55);
+                 d3.select("#tooltip")
                   .style("opacity", 0);
                 })
                .on("mousemove", (event, d) =>{
-                 d3.select("#tooltipLabel")
+                 d3.select("#tooltipLabelHalo")
                   .style("left", (event.pageX + 12) + "px")
-                  .style("top", (event.pageY + 2) + "px")
+                  .style("top", (event.pageY + 2) + "px");
+                  d3.select("#tooltipLabel")
+                  .style("left", (event.pageX + 12) + "px")
+                  .style("top", (event.pageY + 2) + "px");
+                 d3.select("#tooltipValueHalo")
+                  .style("left", (event.pageX + 12) + "px")
+                  .style("top", (event.pageY + 17) + "px");
                  d3.select("#tooltipValue")
                   .style("left", (event.pageX + 12) + "px")
-                  .style("top", (event.pageY + 17) + "px")
+                  .style("top", (event.pageY + 17) + "px");
                });
 
     	        //country labels
