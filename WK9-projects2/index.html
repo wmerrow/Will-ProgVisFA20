@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Force Network Graph Example</title>
+        <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
+        <style type="text/css">
+          
+          .label{
+            font-family:sans-serif;
+            font-size: 14px;
+            position: absolute;
+            font-weight: 700;
+          }
+
+          .halo{
+            stroke: white;
+            stroke-width: 3px;
+            stroke-linecap: butt;
+            stroke-linejoin: miter;
+          }
+
+          .node{
+            stroke: white;
+            stroke-width: 2px;
+          }
+
+          .link{
+            opacity: 0.6;
+          }
+
+        </style>
+    </head>
+    <body>
+        <svg width="900" height="600"></svg>
+        <script type="text/javascript">
+           
+            const svg = d3.select("svg");
+            const w = 900;
+            const h= 600; 
+            
+            // scale for node color
+            const myColor = d3.scaleOrdinal()
+                    .domain(["R", "D"])
+                    .range(['crimson','dodgerblue']);
+            // scale for link width
+            const mySize = d3.scaleLinear()
+                    .domain([17,50])
+                    .range([1,15]);
+            // scale for links
+            const myDistance = d3.scaleLinear()
+                    .domain([17,50])
+                    .range([500,60]);
+
+
+            //bubble radius
+            const r = 15;
+
+            Promise.all([
+                d3.csv("nodes.csv"),
+                d3.csv("links.csv"),
+            ]).then(function(files) {
+                // files[0] will contain nodes.csv
+                // files[1] will contain links.csv
+                // remember to put + when the field has #s in it
+                const dataset = {
+                  "nodes": files[0].map(d => { return {"id": +d.id, "name": d.name, "appointed_by": d.appointed_by}}),
+                  "links": files[1].map(d => { return {"source": +d.Source, "target": +d.Target, "weight": +d.Weight}})
+                };
+                console.log(dataset);
+
+                //our force simulation
+                //comment out these .force() one at a time to see how it changes
+                const simulation = d3.forceSimulation(dataset.nodes)
+                                    //.force("charge", d3.forceManyBody())
+                                    //.force("charge", d3.forceManyBody().strength(-10))
+                                    .force("charge", d3.forceManyBody().strength(-200))
+                                    //.force("link", d3.forceLink(dataset.links))
+                                    .force("link", d3.forceLink(dataset.links).distance(function(d) {return myDistance(d.weight);}))
+                                    //.force("link", d3.forceLink(dataset.links).distance(200)) 
+                                    .force("center", d3.forceCenter().x(w/2).y(h/2));
+                                    //.force("center", d3.forceCenter().x(w/4).y(h/4));
+                                    //.force("center", d3.forceCenter().x(100).y(500));
+                                    //.force("center", d3.forceCenter(500,500));
+                                    //.force("x", d3.forceX().x(100))
+                                    //.force("y", d3.forceY().y(500));
+
+
+
+                //our links (lines)
+                const links = svg.selectAll("line")
+                                 .data(dataset.links)
+                                 .enter()
+                                 .append("line")
+                                 .attr("class", "link")
+                                 .style("stroke", "#777777")
+                                 //.style("stroke-width", 1);
+                                 .style("stroke-width", d=> mySize(d.weight)); //could be set to data /connection strength 
+
+                //our nodes (circles) come after our links on the SVG
+                const nodes = svg.selectAll("circle")
+                                 .data(dataset.nodes)
+                                 .enter()
+                                 .append("circle")
+                                 .attr("class", "node")
+                                 .attr("r", r) //could be set to data as we've done
+                                 .style("fill", d=> myColor(d.appointed_by));
+
+                //label halos
+                const labelHalos = svg.selectAll("text")
+                                 .data(dataset.nodes)
+                                 .enter()
+                                 .append("text")
+                                 .attr("class", "label halo")
+                                 .style("text-anchor", "middle")
+                                 .text(d=> d.name);
+
+                //labels
+                const labels = svg.selectAll("text2")
+                                 .data(dataset.nodes)
+                                 .enter()
+                                 .append("text")
+                                 .attr("class", "label")
+                                 .style("text-anchor", "middle")
+                                 .style("fill", d=> myColor(d.appointed_by))
+                                 .text(d=> d.name);
+
+                //force ticks: remember our links are lines and nodes are circles, which have specific params.
+                simulation.on("tick", (event,d)=>{
+                  
+                  links.attr("x1", d=>d.source.x)
+                       .attr("y1", d=>d.source.y)
+                       .attr("x2", d=>d.target.x)
+                       .attr("y2", d=>d.target.y);
+
+                  nodes.attr("cx", d=>d.x)
+                       .attr("cy", d=>d.y);
+                  
+                  labelHalos.attr("x", d=>d.x)
+                        .attr("y", d=>d.y + r * 2);
+
+                  labels.attr("x", d=>d.x)
+                        .attr("y", d=>d.y + r * 2);
+
+                
+                });
+            });
+
+            
+            
+
+
+        </script>
+    </body>
+</html>

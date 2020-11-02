@@ -30,7 +30,7 @@
                   "nodes": files[0].map(d => { return {"id": +d.id, "name": d.name}}),
                   "links": files[1].map(d => { return {"source": +d.source, "target": +d.target, "weight": +d.weight}})
                 };
-                // console.log(dataset)
+                console.log(dataset);
 
                 //our force simulation
                 //comment out these .force() one at a time to see how it changes
