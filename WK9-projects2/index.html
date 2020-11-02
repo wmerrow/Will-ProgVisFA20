@@ -123,8 +123,16 @@
                                  .append("line")
                                  .attr("class", "link")
                                  .style("stroke", "#777777")
-                                 //.style("stroke-width", 1);
-                                 .style("stroke-width", d=> mySize(d.weight)); //could be set to data /connection strength 
+                                 .style("stroke-width", d=> mySize(d.weight)) 
+                                 // hover effects
+                                 .on("mouseover", function() { d3.select(this).style("stroke", "#000000"); })
+                                 .on("mouseout", function(event, d) {
+                                   d3.select(this)
+                                     .style("stroke", "777777");
+                                   // d3.select("#tooltip")
+                                   //  .style("opacity", 0);
+                                  });
+
 
                 //our nodes (circles) come after our links on the SVG
                 const nodes = svg.selectAll("circle")
