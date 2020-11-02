@@ -133,7 +133,11 @@
                                  .append("circle")
                                  .attr("class", "node")
                                  .attr("r", r) //could be set to data as we've done
-                                 .style("fill", d=> myColor(d.appointed_by));
+                                 .style("fill", d=> myColor(d.appointed_by))
+                                 .call(d3.drag() // using .call() to call our drag event
+                                 .on("start", dragstarted)
+                                 .on("drag", dragged)
+                                 .on("end", dragended));
 
                 //label halos
                 const labelHalos = svg.selectAll("text")
@@ -174,6 +178,24 @@
                 
                 });
             });
+
+            //Drag events
+            function dragstarted(event) {
+              if (!event.active) simulation.alphaTarget(0.4).restart();
+              event.subject.fx = event.subject.x;
+              event.subject.fy = event.subject.y;
+            }
+            
+            function dragged(event) {
+              event.subject.fx = event.x;
+              event.subject.fy = event.y;
+            }
+            
+            function dragended(event) {
+              if (!event.active) simulation.alphaTarget(0);
+              event.subject.fx = null;
+              event.subject.fy = null;
+            }
 
             
             
