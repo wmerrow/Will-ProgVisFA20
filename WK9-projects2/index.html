@@ -53,36 +53,17 @@
             width: 700px;
           }
 
-          #tooltipLabel{
-            position: absolute;
-            text-align: center;
-            font-family:sans-serif;
-            font-size: 14px;
-            font-weight: 550;
-          }
-
-          #tooltipLabelHalo{
-            position: absolute;
-            text-align: center;
-            font-family:sans-serif;
-            font-size: 14px;
-            font-weight: 550;
-            -webkit-text-stroke: 3px white;
-          }
-
           #tooltipValue{
             position: absolute;
-            text-align: center;
             font-family:sans-serif;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: normal;
           }
 
           #tooltipValueHalo{
             position: absolute;
-            text-align: center;
             font-family:sans-serif;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: normal;
             -webkit-text-stroke: 3px white;
           }
@@ -110,13 +91,6 @@
             // append <p> elements for each line of tooltip text
             // Halos have thick white stroke to give the effect of outer stroke, since outer stroke is not possible with CSS
             //IDs could be consolidated to classes in the future
-            const tooltipLabelHalo =d3.select("#tooltip")
-                         .append("p")
-                         .attr("id", "tooltipLabelHalo");
-
-            const tooltipLabel =d3.select("#tooltip")
-                         .append("p")
-                         .attr("id", "tooltipLabel");
 
             const tooltipValueHalo =d3.select("#tooltip")
                          .append("p")
@@ -190,14 +164,10 @@
                                        .style("opacity", 0.9)
                                        .style("left", (event.pageX) + "px")
                                        .style("top", (event.pageY) + "px");
-                                    d3.select("#tooltipLabelHalo")
-                                       .text(d.name);
-                                    d3.select("#tooltipLabel")
-                                       .text(d.name);
                                     d3.select("#tooltipValueHalo")
-                                       .text(d.weight);
+                                       .text(d.weight + "% agreement");
                                     d3.select("#tooltipValue")
-                                       .text(d.weight); 
+                                       .text(d.weight + "% agreement"); 
                                     })
                                  .on("mouseout", function(event, d) {
                                     d3.select(this)
@@ -206,18 +176,12 @@
                                      .style("opacity", 0);
                                     })
                                  .on("mousemove", (event, d) =>{
-                                   d3.select("#tooltipLabelHalo")
-                                    .style("left", (event.pageX) + "px")
-                                    .style("top", (event.pageY) + "px");
-                                    d3.select("#tooltipLabel")
-                                    .style("left", (event.pageX) + "px")
-                                    .style("top", (event.pageY) + "px");
                                    d3.select("#tooltipValueHalo")
-                                    .style("left", (event.pageX) + "px")
-                                    .style("top", (event.pageY + 17) + "px");
+                                    .style("left", (event.pageX + 16) + "px")
+                                    .style("top", (event.pageY - 16) + "px");
                                    d3.select("#tooltipValue")
-                                    .style("left", (event.pageX) + "px")
-                                    .style("top", (event.pageY + 17) + "px");
+                                    .style("left", (event.pageX + 16) + "px")
+                                    .style("top", (event.pageY - 16) + "px");
                                  });
 
 
@@ -240,7 +204,6 @@
                                  .enter()
                                  .append("text")
                                  .attr("class", "label halo")
-                                 .style("text-anchor", "middle")
                                  .text(d=> d.name);
 
                 //labels
@@ -249,7 +212,6 @@
                                  .enter()
                                  .append("text")
                                  .attr("class", "label")
-                                 .style("text-anchor", "middle")
                                  .style("fill", d=> myColor(d.appointed_by))
                                  .text(d=> d.name);
 
