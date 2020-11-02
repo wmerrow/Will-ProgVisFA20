@@ -29,15 +29,44 @@
             opacity: 0.6;
           }
 
+          h1{
+            font-size: 28px;
+            font-family: sans-serif;
+          }
+
+          p{
+            font-size: 18px;
+            font-family: sans-serif;
+          }
+
+          .redText{
+            color: crimson;
+            font-weight: 700;
+          }
+
+          .blueText{
+            color: dodgerblue;
+            font-weight: 700;
+          }
+
+          #header{
+            width: 700px;
+          }
+
         </style>
     </head>
     <body>
-        <svg width="900" height="600"></svg>
+        <div id="header">
+            <h1>How Often Do Supreme Court Justices Agree?</h1>
+            <p>Thicker lines represent two justices voting the same way more often. Republican-appointed justices are shown in <span class="redText">red</span> and Democrat-appointed justices are shown in <span class="blueText">blue</span>. Hover over lines for details.</p>
+        </div>
+
+        <svg width="700" height="400"></svg>
         <script type="text/javascript">
            
             const svg = d3.select("svg");
-            const w = 900;
-            const h= 600; 
+            const w = 700;
+            const h= 400; 
             
             // scale for node color
             const myColor = d3.scaleOrdinal()
@@ -46,11 +75,11 @@
             // scale for link width
             const mySize = d3.scaleLinear()
                     .domain([17,50])
-                    .range([1,15]);
+                    .range([1,17]);
             // scale for links
             const myDistance = d3.scaleLinear()
                     .domain([17,50])
-                    .range([500,60]);
+                    .range([450,87]);
 
 
             //bubble radius
