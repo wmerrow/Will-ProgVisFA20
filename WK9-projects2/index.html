@@ -55,30 +55,34 @@
 
           #tooltipLabel{
             position: absolute;
+            text-align: center;
             font-family:sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 550;
           }
 
           #tooltipLabelHalo{
             position: absolute;
+            text-align: center;
             font-family:sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 550;
             -webkit-text-stroke: 3px white;
           }
 
           #tooltipValue{
             position: absolute;
+            text-align: center;
             font-family:sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: normal;
           }
 
           #tooltipValueHalo{
             position: absolute;
+            text-align: center;
             font-family:sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: normal;
             -webkit-text-stroke: 3px white;
           }
@@ -99,9 +103,9 @@
             const h= 400; 
 
             const tooltip =d3.select("body")
-             .append("div")
-             .attr("id", "tooltip")
-             .style("opacity", 0);
+                         .append("div")
+                         .attr("id", "tooltip")
+                         .style("opacity", 0);
 
             // append <p> elements for each line of tooltip text
             // Halos have thick white stroke to give the effect of outer stroke, since outer stroke is not possible with CSS
@@ -113,6 +117,14 @@
             const tooltipLabel =d3.select("#tooltip")
                          .append("p")
                          .attr("id", "tooltipLabel");
+
+            const tooltipValueHalo =d3.select("#tooltip")
+                         .append("p")
+                         .attr("id", "tooltipValueHalo");
+
+            const tooltipValue =d3.select("#tooltip")
+                         .append("p")
+                         .attr("id", "tooltipValue");
             
             // scale for node color
             const myColor = d3.scaleOrdinal()
@@ -176,8 +188,8 @@
                                        .style("stroke", "#000000");
                                     d3.select("#tooltip")
                                        .style("opacity", 0.9)
-                                       .style("left", (event.pageX + 12) + "px")
-                                       .style("top", (event.pageY + 2) + "px");
+                                       .style("left", (event.pageX) + "px")
+                                       .style("top", (event.pageY) + "px");
                                     d3.select("#tooltipLabelHalo")
                                        .text(d.name);
                                     d3.select("#tooltipLabel")
@@ -195,16 +207,16 @@
                                     })
                                  .on("mousemove", (event, d) =>{
                                    d3.select("#tooltipLabelHalo")
-                                    .style("left", (event.pageX + 12) + "px")
-                                    .style("top", (event.pageY + 2) + "px");
+                                    .style("left", (event.pageX) + "px")
+                                    .style("top", (event.pageY) + "px");
                                     d3.select("#tooltipLabel")
-                                    .style("left", (event.pageX + 12) + "px")
-                                    .style("top", (event.pageY + 2) + "px");
+                                    .style("left", (event.pageX) + "px")
+                                    .style("top", (event.pageY) + "px");
                                    d3.select("#tooltipValueHalo")
-                                    .style("left", (event.pageX + 12) + "px")
+                                    .style("left", (event.pageX) + "px")
                                     .style("top", (event.pageY + 17) + "px");
                                    d3.select("#tooltipValue")
-                                    .style("left", (event.pageX + 12) + "px")
+                                    .style("left", (event.pageX) + "px")
                                     .style("top", (event.pageY + 17) + "px");
                                  });
 
