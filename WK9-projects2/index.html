@@ -106,12 +106,12 @@
                     .range(['crimson','dodgerblue']);
             // scale for link width
             const mySize = d3.scaleLinear()
-                    .domain([17,50])
-                    .range([1,17]);
+                    .domain([45,93])
+                    .range([2,17]);
             // scale for links
             const myDistance = d3.scaleLinear()
-                    .domain([17,50])
-                    .range([450,87]);
+                    .domain([45,93])
+                    .range([600,87]);
 
 
             //bubble radius
@@ -204,6 +204,7 @@
                                  .enter()
                                  .append("text")
                                  .attr("class", "label halo")
+                                 .style("text-anchor", "middle")
                                  .text(d=> d.name);
 
                 //labels
@@ -212,24 +213,25 @@
                                  .enter()
                                  .append("text")
                                  .attr("class", "label")
+                                 .style("text-anchor", "middle")
                                  .style("fill", d=> myColor(d.appointed_by))
                                  .text(d=> d.name);
 
                 //force ticks: remember our links are lines and nodes are circles, which have specific params.
                 simulation.on("tick", (event,d)=>{
                   
-                  links.attr("x1", d=>d.source.x)
+                  links.attr("x1", d=>d.source.x * -1 + w) // multiply x by -1 and add width to flip so conservatives are on the right
                        .attr("y1", d=>d.source.y)
-                       .attr("x2", d=>d.target.x)
+                       .attr("x2", d=>d.target.x * -1 + w)
                        .attr("y2", d=>d.target.y);
 
-                  nodes.attr("cx", d=>d.x)
+                  nodes.attr("cx", d=>d.x * -1 + w)
                        .attr("cy", d=>d.y);
                   
-                  labelHalos.attr("x", d=>d.x)
+                  labelHalos.attr("x", d=>d.x * -1 + w)
                         .attr("y", d=>d.y + r * 2);
 
-                  labels.attr("x", d=>d.x)
+                  labels.attr("x", d=>d.x * -1 + w)
                         .attr("y", d=>d.y + r * 2);
 
                 
