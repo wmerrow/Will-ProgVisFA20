@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <title>Slider</title>
+      <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
+      <script type="text/javascript" src= "../d3-simple-slider.js"></script>
+      <style type="text/css"> 
+
+        .axis text,
+        .slider text {
+          font-size: 13px;
+        }
+
+        .panel {
+          display: inline-block;
+        }
+
+        .vis {
+          display: block;
+        }
+
+          /*svg{
+              width:1000px;
+              height:500px;
+              margin-left: auto; 
+              margin-right: auto;
+              display: block;
+              }*/
+
+    </style>
+  </head>
+  <body>
+
+    <div id="slider"></div>
+
+    <div class="panel">
+      <svg id="presMap" class="vis"></svg>
+      <svg id="presChart" class="vis"></svg>
+    </div>
+    <div class="panel">
+      <svg id="houseMap" class="vis"></svg>
+      <svg id="houseChart" class="vis"></svg>
+    </div>
+    <div class="panel">
+      <svg id="senateMap" class="vis"></svg>
+      <svg id="senateChart" class="vis"></svg>
+    </div>
+        
+    <script type="text/javascript">
+    
+    d3.csv("data/mapTest.csv")
+      .then(function(data) {
+
+      console.log(data);
+
+      // margins
+      const margin = {
+        top: 10,
+        left: 10
+      };
+
+      // dimensions of state squares
+      const square = {
+        w: 20,
+        h: 20
+      };
+
+      const red = '#cf4938';
+      const blue = '#4287f5';
+      // color scale
+      const leanColor = d3.scaleThreshold()
+        .domain([0]) // split at 0
+        .range([blue, red]);
+      
+      // slider min/max
+      const voteMaxD = -8;
+      const voteMaxR = 8;
+      // slider increment
+      const increment = 2;
+      // create array of integers to use for slider ticks
+      const voteRange = [];
+      for (var i = voteMaxD; i <= voteMaxR; i = i + increment) {
+        voteRange.push(i);
+      }
+
+      // SLIDER
+
+      const slider = d3.sliderTop()
+        .min(voteMaxD)
+        .max(voteMaxR)
+        .default(0)
+        .step(.5)
+        .width(600)
+        // custom slider symbol
+        .handle(
+          d3.symbol()
+            .type(d3.symbolCircle)
+            .size(150)()
+          )
+        .tickValues(voteRange)
+        // remove minus signs
+        .tickFormat(Math.abs)
+        .displayValue(false)
+        // onchange, pass slider value to update
+        .on('onchange', function (value) {
+          update(value);
+        });
+
+      d3.select('#slider')
+        .append('svg')
+        .attr('width', 800)
+        .attr('height', 200)
+        .append('g')
+        .attr('transform', 'translate(30,100)')
+        .call(slider);
+
+
+      // SVG dimensions
+      const svg1 = d3.select('#presMap')
+        .attr('width', 12 * square.w + margin.left)
+        .attr('height', 8 * square.h + margin.top);
+
+      const svg2 = d3.select('#houseMap')
+        .attr('width', 12 * square.w + margin.left)
+        .attr('height', 8 * square.h + margin.top);
+
+      const svg3 = d3.select('#senateMap')
+        .attr('width', 12 * square.w + margin.left)
+        .attr('height', 8 * square.h + margin.top);
+
+      const svg4 = d3.select('#presChart')
+        .attr('width', 12 * square.w + margin.left)
+        .attr('height', 8 * square.h + margin.top);
+
+      const svg5 = d3.select('#houseChart')
+        .attr('width', 12 * square.w + margin.left)
+        .attr('height', 8 * square.h + margin.top);
+
+      const svg6 = d3.select('#senateChart')
+        .attr('width', 12 * square.w + margin.left)
+        .attr('height', 8 * square.h + margin.top);
+
+      // add g for each state in appropriate position
+      // const g = svg.append('g')
+      //   .selectAll('g')
+      //   .data(data)
+      //   .enter()
+      //   .append('g')
+      //   .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';});
+
+
+      // MAPS
+
+      presSquares = svg1.selectAll('rect')
+        .data(data)
+        .join('rect')
+        .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';})
+        .attr('width', square.w)
+        .attr('height', square.h)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .style('stroke', '#ffffff')
+        .style('stroke-width', '1px');
+
+      houseSquares = svg2.selectAll('rect')
+        .data(data)
+        .join('rect')
+        .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';})
+        .attr('width', square.w)
+        .attr('height', square.h)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .style('stroke', '#ffffff')
+        .style('stroke-width', '1px');
+
+      senateSquares = svg3.selectAll('rect')
+        .data(data)
+        .join('rect')
+        .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';})
+        .attr('width', square.w)
+        .attr('height', square.h)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .style('stroke', '#ffffff')
+        .style('stroke-width', '1px');
+
+
+      // BAR CHARTS
+
+      presBar = svg4.selectAll('rect')
+        .data(data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('transform', (d, i)=>{return 'translate(' + (i * (12 * square.w / 100 + 2) + margin.left) + ',' + margin.top + ')';})
+        .attr('width', 4)
+        .attr('height', square.h)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .style('stroke', '#ffffff')
+        .style('stroke-width', '0.5px');
+
+      houseBar = svg5.selectAll('rect')
+        .data(data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('transform', (d, i)=>{return 'translate(' + (i * (12 * square.w / 100 + 2) + margin.left) + ',' + margin.top + ')';})
+        .attr('width', 4)
+        .attr('height', square.h)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .style('stroke', '#ffffff')
+        .style('stroke-width', '0.5px');
+
+      senateBar = svg6.selectAll('rect')
+        .data(data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('transform', (d, i)=>{return 'translate(' + (i * (12 * square.w / 100 + 2) + margin.left) + ',' + margin.top + ')';})
+        .attr('width', 4)
+        .attr('height', square.h)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .style('stroke', '#ffffff')
+        .style('stroke-width', '0.5px');
+
+
+      // initial color (popular vote = 0)
+      update(0);
+
+      // update the map
+      function update(vote) {
+        
+        presSquares.style('fill', d => {
+              return leanColor(+d.rlean + vote);
+          });
+
+        houseSquares.style('fill', d => {
+              return leanColor(+d.rlean + vote - 2);
+          });
+
+        senateSquares.style('fill', d => {
+              return leanColor(+d.rlean + vote - 4);
+          });
+
+        presBar.style('fill', d => {
+              return leanColor(+d.rlean + vote);
+          });
+
+        houseBar.style('fill', d => {
+              return leanColor(+d.rlean + vote - 2);
+          });
+
+        senateBar.style('fill', d => {
+              return leanColor(+d.rlean + vote - 4);
+          });
+
+        };
+
+      // TEST labels
+      // g.append('text')
+      //   .attr('x', square.w / 2)
+      //   .attr('y', square.h / 2)
+      //   .style('text-anchor', 'middle')
+      //   .attr('transform', 'translate(0,5)')
+      //   .style('fill', '#ffffff')
+      //   .attr('class', 'label')
+      //   .text(d=> {return d.rlean;});
+
+
+      // NOTES
+
+      // could also try using if instead of leanColor in case it gives better performance:
+      // if (d.rlean >= 0) {
+      //   return '#cf4938';
+      // } else {
+      //   return '#4287f5';
+      // }
+
+    })
+        .catch(function(error){
+          // handle error 
+          console.log(error);
+    });
+
+    </script>
+  </body>
+</html>
