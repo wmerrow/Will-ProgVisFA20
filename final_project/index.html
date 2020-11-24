@@ -14,6 +14,8 @@
 
         .panel {
           display: inline-block;
+          margin-left: 15px;
+          margin-right: 15px;
         }
 
         .vis {
@@ -49,21 +51,33 @@
         
     <script type="text/javascript">
     
-    d3.csv("data/mapTest.csv")
-      .then(function(data) {
+    Promise.all([
+	    d3.csv("data/pres_data.csv"),
+	    d3.csv("data/house_data.csv"),
+	    d3.csv("data/senate_data.csv")
+	])
+     .then(function(data) {
 
-      console.log(data);
+      const pres_data = data[0];
+      const house_data = data[1];
+      const senate_data = data[2];
+
+      console.log(pres_data);
+      console.log(house_data);
+      console.log(senate_data);
 
       // margins
       const margin = {
         top: 10,
+        right: 10,
+        bottom: 10,
         left: 10
       };
 
       // dimensions of state squares
       const square = {
-        w: 20,
-        h: 20
+        w: 30,
+        h: 30
       };
 
       const red = '#cf4938';
@@ -86,7 +100,8 @@
 
       // SLIDER
 
-      const slider = d3.sliderTop()
+     // define the slider
+     const slider = d3.sliderTop()
         .min(voteMaxD)
         .max(voteMaxR)
         .default(0)
@@ -102,11 +117,12 @@
         // remove minus signs
         .tickFormat(Math.abs)
         .displayValue(false)
-        // onchange, pass slider value to update
+        // onchange, pass slider value to update function
         .on('onchange', function (value) {
           update(value);
         });
 
+      // add the slider
       d3.select('#slider')
         .append('svg')
         .attr('width', 800)
@@ -118,28 +134,28 @@
 
       // SVG dimensions
       const svg1 = d3.select('#presMap')
-        .attr('width', 12 * square.w + margin.left)
-        .attr('height', 8 * square.h + margin.top);
+        .attr('width', 11 * square.w + margin.left + margin.right)
+        .attr('height', 8 * square.h + margin.top + margin.bottom);
 
       const svg2 = d3.select('#houseMap')
-        .attr('width', 12 * square.w + margin.left)
-        .attr('height', 8 * square.h + margin.top);
+        .attr('width', 11 * square.w + margin.left + margin.right)
+        .attr('height', 8 * square.h + margin.top + margin.bottom);
 
       const svg3 = d3.select('#senateMap')
-        .attr('width', 12 * square.w + margin.left)
-        .attr('height', 8 * square.h + margin.top);
+        .attr('width', 11 * square.w + margin.left + margin.right)
+        .attr('height', 8 * square.h + margin.top + margin.bottom);
 
       const svg4 = d3.select('#presChart')
-        .attr('width', 12 * square.w + margin.left)
-        .attr('height', 8 * square.h + margin.top);
+        .attr('width', 11 * square.w + margin.left + margin.right)
+        .attr('height', 8 * square.h + margin.top + margin.bottom);
 
       const svg5 = d3.select('#houseChart')
-        .attr('width', 12 * square.w + margin.left)
-        .attr('height', 8 * square.h + margin.top);
+        .attr('width', 11 * square.w + margin.left + margin.right)
+        .attr('height', 8 * square.h + margin.top + margin.bottom);
 
       const svg6 = d3.select('#senateChart')
-        .attr('width', 12 * square.w + margin.left)
-        .attr('height', 8 * square.h + margin.top);
+        .attr('width', 11 * square.w + margin.left + margin.right)
+        .attr('height', 8 * square.h + margin.top + margin.bottom);
 
       // add g for each state in appropriate position
       // const g = svg.append('g')
@@ -153,7 +169,7 @@
       // MAPS
 
       presSquares = svg1.selectAll('rect')
-        .data(data)
+        .data(pres_data)
         .join('rect')
         .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';})
         .attr('width', square.w)
@@ -163,7 +179,7 @@
         .style('stroke-width', '1px');
 
       houseSquares = svg2.selectAll('rect')
-        .data(data)
+        .data(house_data)
         .join('rect')
         .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';})
         .attr('width', square.w)
@@ -173,7 +189,7 @@
         .style('stroke-width', '1px');
 
       senateSquares = svg3.selectAll('rect')
-        .data(data)
+        .data(senate_data)
         .join('rect')
         .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';})
         .attr('width', square.w)
@@ -185,32 +201,59 @@
 
       // BAR CHARTS
 
+      // bar dimensions
+      const bar = {
+        w: square.w * 11, // width of map
+        h: square.w * 11 / 87 * 5 // sets height all bar charts so that house squares will be perfectly square (house grid is 87 by 5)
+      };
+
+      const myStack = function (dataToStack) {
+		  const total = d3.sum(dataToStack, d => d.electors);
+		  let stackPosition = 0;
+		  return dataToStack.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean))
+		  	.map(d => ({
+		    state: d.state,
+		    col: d.col,
+		    row: d.row,
+		    rlean: d.rlean,
+		    electors: +d.electors,
+		    startPosition: stackPosition,
+		    endPosition: (stackPosition += +d.electors)
+		  }));
+		};
+
+		// console.log(myStack(data));
+
       presBar = svg4.selectAll('rect')
-        .data(data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .data(myStack(pres_data))
         .join('rect')
-        .attr('transform', (d, i)=>{return 'translate(' + (i * (12 * square.w / 100 + 2) + margin.left) + ',' + margin.top + ')';})
-        .attr('width', 4)
-        .attr('height', square.h)
+        //.attr('transform', (d, i)=>{return 'translate(' + (i * (12 * square.w / 100 + 2) + margin.left) + ',' + margin.top + ')';})
+        .attr('x', d=> d.startPosition / 538 * bar.w + margin.left)
+        .attr('y', margin.top)
+        .attr('width', d=> d.electors / 538 * bar.w)
+        .attr('height', bar.h)
         .attr('vector-effect', 'non-scaling-stroke')
         .style('stroke', '#ffffff')
         .style('stroke-width', '0.5px');
 
       houseBar = svg5.selectAll('rect')
-        .data(data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .data(house_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
         .join('rect')
-        .attr('transform', (d, i)=>{return 'translate(' + (i * (12 * square.w / 100 + 2) + margin.left) + ',' + margin.top + ')';})
-        .attr('width', 4)
-        .attr('height', square.h)
+        // determine x and y, wrapping from one column to the next (wrap to next column after 5 squares)
+        .attr('x', (d, i)=>{return Math.floor(i / 5) * bar.w / 87 + margin.left;}) // use math.floor to determine column
+        .attr('y', (d, i)=>{return (i % 5) * bar.h / 5 + margin.top;}) // use modulo to determine row
+        .attr('width', bar.w / 87)
+        .attr('height', bar.h / 5)
         .attr('vector-effect', 'non-scaling-stroke')
         .style('stroke', '#ffffff')
         .style('stroke-width', '0.5px');
 
       senateBar = svg6.selectAll('rect')
-        .data(data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .data(senate_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
         .join('rect')
-        .attr('transform', (d, i)=>{return 'translate(' + (i * (12 * square.w / 100 + 2) + margin.left) + ',' + margin.top + ')';})
-        .attr('width', 4)
-        .attr('height', square.h)
+        .attr('transform', (d, i)=>{return 'translate(' + (i * bar.w / 100 + margin.left) + ',' + margin.top + ')';})
+        .attr('width', bar.w / 100)
+        .attr('height', bar.h)
         .attr('vector-effect', 'non-scaling-stroke')
         .style('stroke', '#ffffff')
         .style('stroke-width', '0.5px');
@@ -219,19 +262,21 @@
       // initial color (popular vote = 0)
       update(0);
 
-      // update the map
+      // function for updating colors
       function update(vote) {
         
+        // can add transitions before .style
+
         presSquares.style('fill', d => {
               return leanColor(+d.rlean + vote);
           });
 
         houseSquares.style('fill', d => {
-              return leanColor(+d.rlean + vote - 2);
+              return leanColor(+d.rlean + vote);
           });
 
         senateSquares.style('fill', d => {
-              return leanColor(+d.rlean + vote - 4);
+              return leanColor(+d.rlean + vote);
           });
 
         presBar.style('fill', d => {
@@ -239,11 +284,11 @@
           });
 
         houseBar.style('fill', d => {
-              return leanColor(+d.rlean + vote - 2);
+              return leanColor(+d.rlean + vote);
           });
 
         senateBar.style('fill', d => {
-              return leanColor(+d.rlean + vote - 4);
+              return leanColor(+d.rlean + vote);
           });
 
         };
