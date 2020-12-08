@@ -5,54 +5,60 @@
       <title>Slider</title>
       <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
       <script type="text/javascript" src= "../d3-simple-slider.js"></script>
-      <style type="text/css"> 
-
-        .axis text,
-        .slider text {
-          font-size: 13px;
-        }
-
-        .panel {
-          display: inline-block;
-          margin-left: 15px;
-          margin-right: 15px;
-        }
-
-        .vis {
-          display: block;
-        }
-
-        .rect {
-        	stroke: #ffffff;
-        	stroke-width: 0.5px;
-        }
-
-          /*svg{
-              width:1000px;
-              height:500px;
-              margin-left: auto; 
-              margin-right: auto;
-              display: block;
-              }*/
-
-    </style>
+      <link rel="stylesheet" href="styles.css">
   </head>
   <body>
 
-    <div id="slider"></div>
+    <section>
+      <h1>American Democracy Is Rigged Against Democrats</h1>
+      <div class="intro">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        <div id="slider"></div>
+        <div id="summaryResult"></div>
+      </div>
+    </section>
 
-    <div class="panel">
-      <svg id="presMap" class="vis"></svg>
-      <svg id="presChart" class="vis"></svg>
-    </div>
-    <div class="panel">
-      <svg id="houseMap" class="vis"></svg>
-      <svg id="houseChart" class="vis"></svg>
-    </div>
-    <div class="panel">
-      <svg id="senateMap" class="vis"></svg>
-      <svg id="senateChart" class="vis"></svg>
-    </div>
+    <section>
+      <h2>The Presidency</h2>
+      <div class="explainer">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+      <div class="panel">
+        <div id="presSlider"></div>
+        <div id="presResult"></div>
+        <svg id="presMap" class="vis"></svg>
+        <svg id="presChart" class="vis"></svg>
+      </div>
+    </section>
+
+    <section>
+      <h2>The House of Representatives</h2>
+      <div class="explainer">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+      <div class="panel">
+        <div id="houseSlider"></div>
+        <div id="houseResult"></div>
+        <svg id="houseMap" class="vis"></svg>
+        <svg id="houseChart" class="vis"></svg>
+      </div>
+    </section>
+    
+    <section>
+      <h2>The Senate</h2>
+      <div class="explainer">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+      <div class="panel">
+        <div id="senateSlider"></div>
+        <div id="senateResult"></div>
+        <svg id="senateMap" class="vis"></svg>
+        <svg id="senateChart" class="vis"></svg>
+      </div>
+    </section>
         
     <script type="text/javascript">
     
@@ -75,6 +81,7 @@
       // DIMENSIONS
 
       // margins
+
       const margin = {
         top: 10,
         right: 10,
@@ -83,38 +90,40 @@
       };
 
       // squares
-      
-      const square = {
-        w: 30,
-        h: 30
-      };
+
+      const squareScale = 1.5
 
       const pres_square = {
-        w: 5,
-        h: 5
+        w: squareScale * 30,
+        h: squareScale * 30
       };
-
       const house_square = {
-        w: 4,
-        h: 4
+        w: squareScale * 4,
+        h: squareScale * 4
       };
-
       const senate_square = {
-        w: 7,
-        h: 7
+        w: squareScale * 7,
+        h: squareScale * 7
       };
 
-      // maps
+      // panel dimensions
+
+      const panelWidth = 600;
+
       const map = {
-        w: square.w * 11, // width of map
-        h: square.w * 11 * 0.61835245046 // map aspect ratio
+        w: panelWidth, // width of map
+        h: panelWidth * 0.61835245046 // map aspect ratio
       };
 
-      // bar charts
       const bar = {
-        w: square.w * 11, // width of map
-        h: square.w * 11 / 87 * 5 // sets height all bar charts so that house squares will be perfectly square (house grid is 87 by 5)
+        w: panelWidth, // width of map
+        h: panelWidth / 87 * 5 // sets height all bar charts so that house squares will be perfectly square (house grid is 87 by 5)
       };
+
+      const introSlider = {
+        w: panelWidth,
+        h: 150
+      }
 
 
       // SCALES
@@ -130,7 +139,7 @@
       // pres state size scale
       const presSize = d3.scaleSqrt()
       	.domain([0, 55]) // max electoral votes is 55 (California)
-      	.range([0, 30]);
+      	.range([0, pres_square.w]);
       
       // slider min/max
       const voteMaxD = -8;
@@ -152,7 +161,7 @@
         .max(voteMaxR)
         .default(0)
         .step(.5)
-        .width(600)
+        .width(introSlider.w - 30)
         // custom slider symbol
         .handle(
           d3.symbol()
@@ -171,10 +180,10 @@
       // add the slider
       d3.select('#slider')
         .append('svg')
-        .attr('width', 800)
-        .attr('height', 200)
+        .attr('width', introSlider.w)
+        .attr('height', introSlider.h)
         .append('g')
-        .attr('transform', 'translate(30,100)')
+        .attr('transform', 'translate(15,75)')
         .call(slider);
 
 
@@ -255,7 +264,6 @@
         .join('rect')
         .attr('x', d=> +d.state_x * map.w + +d.offset_x * senate_square.w + margin.left)
         .attr('y', d=> +d.state_y * map.h + +d.offset_y * senate_square.h + margin.top)
-        //.attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';})
         .attr('width', senate_square.w)
         .attr('height', senate_square.h)
         .attr('class', 'rect');
