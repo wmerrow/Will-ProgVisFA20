@@ -18,7 +18,7 @@
         }
 
         #introPop {
-          margin-bottom: 25px;          
+          margin-bottom: 45px;          
         }
 
         .row {
@@ -108,7 +108,8 @@
         .rightLabel {
           width: 200px;
           display: inline-block;
-          margin-top: 5px;
+          vertical-align: top;
+          margin-top: 10px;
         }
 
         .sliderTitle {
@@ -120,13 +121,48 @@
           fill: #000000;
         }
 
+        .majorityLabel {
+          font-size: 12px;
+          font-family: sans-serif;
+          text-align: center;
+          margin-bottom: 0px;
+        }
+
+        .sliderSvg {
+          margin: auto;
+          margin-bottom: 15px;
+        }
+
         h3 {
           /*text-transform: uppercase;*/
-          font-size: 14px;
+          font-size: 15px;
           font-weight: bold;
           font-family: sans-serif;
           text-align: right;
         }
+
+        h4 {
+          /*text-transform: uppercase;*/
+          font-size: 13px;
+          font-weight: bold;
+          font-family: sans-serif;
+          font-style: italic;
+          text-align: center;
+          margin-bottom: 0px;
+        }
+
+        .winnerText {
+          font-weight: bold;
+          font-size: 14px;
+          font-family: sans-serif;
+        }
+
+        .resultText {
+          font-weight: normal;
+          font-size: 12px;
+          font-family: sans-serif;
+        }
+
 /*        .myRect {
           fill: none;
           stroke: url(#linear-gradient);
@@ -140,5 +176,5 @@
 
         .axis text {
           font-size: 13px;
-          fill: #aaaaaa;
+          fill: #888888;
         }
