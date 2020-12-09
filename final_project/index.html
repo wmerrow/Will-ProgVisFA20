@@ -11,9 +11,38 @@
 
     <section>
       <h1>American Democracy Is Rigged Against Democrats</h1>
-      <div id="intro">
+      <div id="introBlurb">
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-        <svg id="introSlider" class="vis"></div>
+      </div> 
+      <div class="row">  
+        <svg id="introSlider" class="vis"></svg>
+      </div>
+      <div class="row">
+        <div class="leftLabel">
+          <h3>Popular vote</h3>
+        </div>
+        <svg id="introPop" class="introVis"></svg>
+        <div class="rightLabel">
+          <h3>Popular vote</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="leftLabel">
+          <h3>Presidency</h3>
+        </div>
+        <svg id="introPresChart" class="introVis"></svg>
+      </div>
+      <div class="row">
+        <div class="leftLabel">
+          <h3>House</h3>
+        </div>
+        <svg id="introHouseChart" class="introVis"></svg>
+      </div>
+      <div class="row">
+        <div class="leftLabel">
+          <h3>Senate</h3>
+        </div>
+        <svg id="introSenateChart" class="introVis"></svg>
       </div>
     </section>
 
@@ -27,7 +56,7 @@
         <svg id="presSlider" class="vis"></svg>
         <svg id="presMap" class="vis"></svg>
         <svg id="presChart" class="vis"></svg>
-        <svg id="popChart" class="vis"></svg>
+        <svg id="presPop" class="vis"></svg>
       </div>
     </section>
 
@@ -41,6 +70,7 @@
         <svg id="houseSlider" class="vis"></svg>
         <svg id="houseMap" class="vis"></svg>
         <svg id="houseChart" class="vis"></svg>
+        <svg id="housePop" class="vis"></svg>
       </div>
     </section>
     
@@ -54,6 +84,7 @@
         <svg id="senateSlider" class="vis"></svg>
         <svg id="senateMap" class="vis"></svg>
         <svg id="senateChart" class="vis"></svg>
+        <svg id="senatePop" class="vis"></svg>
       </div>
     </section>
         
@@ -120,8 +151,8 @@
       };
 
       const sliderSize = {
-        w: panelWidth,
-        h: 150
+        w: panelWidth * 0.75,
+        h: 100
       };
 
       const sliderMargin = 15;
@@ -211,14 +242,14 @@
           .attr('width', sliderWidth)
           .attr('height', sliderHeight)
           .append('g')
-          .attr('transform', 'translate(' + sliderMargin + ',' + sliderSize.h / 2 + ')')
+          .attr('transform', 'translate(' + sliderMargin + ',' + (sliderSize.h - 10) + ')')
           .call(slider);
 
         // add slider titles
         d3.selectAll('.slider')
           .append('text')
           .attr('class', 'sliderTitle')
-          .text('Popular Vote')
+          .text('Scenario')
           .attr('transform', 'translate(' + (sliderWidth - sliderMargin * 2) / 2 + ', -45)');
 
         // add result titles
@@ -274,7 +305,6 @@ mySvg.append('path')
     .attr("stroke-width", 6)
     .attr("stroke", "url(#linear-gradient)");
 
-
 mySvg.append('rect')
     .attr('x', 110)
     .attr('y', 0)
@@ -296,35 +326,52 @@ mySvg.append('rect')
 
 
 
-      // panel SVG dimensions
-      const svg1 = d3.select('#presMap')
+      // SVG dimensions
+
+      // intro chart SVGs
+      const introPopSvg = d3.select('#introPop')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      const introPresBarSvg = d3.select('#introPresChart')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      const introHouseBarSvg = d3.select('#introHouseChart')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      const introSenateBarSvg = d3.select('#introSenateChart')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+
+      // panel chart SVGs
+      const presBarSvg = d3.select('#presChart')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      const houseBarSvg = d3.select('#houseChart')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      const senateBarSvg = d3.select('#senateChart')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      const presPopSvg = d3.select('#presPop')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      const housePopSvg = d3.select('#housePop')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      const senatePopSvg = d3.select('#senatePop')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+      
+      // panel map SVGs
+      const presMapSvg = d3.select('#presMap')
         .attr('width', map.w + margin.left + margin.right)
         .attr('height', map.h + margin.top + margin.bottom);
-
-      const svg2 = d3.select('#houseMap')
+      const houseMapSvg = d3.select('#houseMap')
         .attr('width', map.w + margin.left + margin.right)
         .attr('height', map.h + margin.top + margin.bottom);
-
-      const svg3 = d3.select('#senateMap')
+      const senateMapSvg = d3.select('#senateMap')
         .attr('width', map.w + margin.left + margin.right)
         .attr('height', map.h + margin.top + margin.bottom);
-
-      const svg4 = d3.select('#presChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-
-      const svg5 = d3.select('#houseChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-
-      const svg6 = d3.select('#senateChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-
-
-      const svg7 = d3.select('#popChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
 
 
       // add g for each state in appropriate position
@@ -346,15 +393,17 @@ mySvg.append('rect')
 		    .attr("y",margin.top);
 		};
 
-	  basemap(svg1);
-	  basemap(svg2);
-	  basemap(svg3);
+	  basemap(presMapSvg);
+	  basemap(houseMapSvg);
+	  basemap(senateMapSvg);
 
 	  // const districtsByState = d3.rollup(house_data, v => d3.max(v, d => +d.state_x), d=> d.state_abbr);
 
 	  // console.log(districtsByState);
 
-      presSquares = svg1.selectAll('rect')
+      // squares for maps
+
+      presSquares = presMapSvg.selectAll('rect')
         .data(pres_data)
         .join('rect')
         // x and y position account for size of square in order to center square
@@ -364,7 +413,7 @@ mySvg.append('rect')
         .attr('height', d=> presSize(+d.electors))
         .attr('class', 'rect');
 
-      houseSquares = svg2.selectAll('rect')
+      houseSquares = houseMapSvg.selectAll('rect')
         .data(house_data)
         .join('rect')
         // position squares for each state, using state coordinates and then using modulo to create columns, with column size determined by the square root of the total districts in state, resulting in roughly square grids
@@ -372,9 +421,9 @@ mySvg.append('rect')
         .attr('y', (d, i)=> {return (+d.state_y + +d.offset_y) * map.h + margin.top + ((d.district_number - 1) % Math.ceil(Math.sqrt(d.state_total))) * house_square.h - Math.ceil(Math.sqrt(d.state_total)) * house_square.h / 2;})
         .attr('width', house_square.w)
         .attr('height', house_square.h)
-		.attr('class', 'rect');	
+		    .attr('class', 'rect');	
 
-      senateSquares = svg3.selectAll('rect')
+      senateSquares = senateMapSvg.selectAll('rect')
         .data(senate_data)
         .join('rect')
         .attr('x', d=> +d.state_x * map.w + +d.offset_x * senate_square.w + margin.left)
@@ -402,7 +451,9 @@ mySvg.append('rect')
 		  	}));
 	  };
 
-      presBar = svg4.selectAll('rect')
+      // panel bar charts
+
+      presBar = presBarSvg.selectAll('rect')
         .data(myStack(pres_data)) // uses stacked data
         .join('rect')
         .attr('x', d=> d.startPosition / 538 * bar.w + margin.left)
@@ -412,7 +463,7 @@ mySvg.append('rect')
         //.attr('vector-effect', 'non-scaling-stroke')
         .attr('class', 'rect');
 
-      houseBar = svg5.selectAll('rect')
+      houseBar = houseBarSvg.selectAll('rect')
         .data(house_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
         .join('rect')
         // determine x and y, wrapping from one column to the next (wrap to next column after 5 squares)
@@ -422,7 +473,7 @@ mySvg.append('rect')
         .attr('height', bar.h / 5)
         .attr('class', 'rect');
 
-      senateBar = svg6.selectAll('rect')
+      senateBar = senateBarSvg.selectAll('rect')
         .data(senate_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
         .join('rect')
         .attr('x', (d, i)=> i * bar.w / 100 + margin.left)
@@ -431,17 +482,74 @@ mySvg.append('rect')
         .attr('height', bar.h)
         .attr('class', 'rect');
 
-
-      popBar = svg7.selectAll('rect')
+      presPop = presPopSvg.selectAll('rect')
         .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
         .join('rect')
         .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
         .attr('y', margin.top)
         .attr('width', bar.w / 400)
+        .attr('height', bar.h / 2);
+
+      housePop = housePopSvg.selectAll('rect')
+        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
+        .attr('y', margin.top)
+        .attr('width', bar.w / 400)
+        .attr('height', bar.h / 2);
+
+      senatePop = senatePopSvg.selectAll('rect')
+        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
+        .attr('y', margin.top)
+        .attr('width', bar.w / 400)
+        .attr('height', bar.h / 2);
+
+      // intro bar charts
+
+      introPopBar = introPopSvg.selectAll('rect')
+        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
+        .attr('y', margin.top)
+        .attr('width', bar.w / 400)
+        .attr('height', bar.h);
+
+      introPresBar = introPresBarSvg.selectAll('rect')
+        .data(myStack(pres_data)) // uses stacked data
+        .join('rect')
+        .attr('x', d=> d.startPosition / 538 * bar.w + margin.left)
+        .attr('y', margin.top)
+        .attr('width', d=> d.electors / 538 * bar.w)
         .attr('height', bar.h)
+        //.attr('vector-effect', 'non-scaling-stroke')
         .attr('class', 'rect');
 
+      introHouseBar = introHouseBarSvg.selectAll('rect')
+        .data(house_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        // determine x and y, wrapping from one column to the next (wrap to next column after 5 squares)
+        .attr('x', (d, i)=>{return Math.floor(i / 5) * bar.w / 87 + margin.left;}) // use math.floor to determine column
+        .attr('y', (d, i)=>{return (i % 5) * bar.h / 5 + margin.top;}) // use modulo to determine row
+        .attr('width', bar.w / 87)
+        .attr('height', bar.h / 5)
+        .attr('class', 'rect');
+
+      introSenateBar = introSenateBarSvg.selectAll('rect')
+        .data(senate_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('x', (d, i)=> i * bar.w / 100 + margin.left)
+        .attr('y', margin.top)
+        .attr('width', bar.w / 100)
+        .attr('height', bar.h)
+        .attr('class', 'rect');   
+
+      // bars for popular vote
+
+
       
+
       // COLOR
       let graphics = [];
 
@@ -449,13 +557,13 @@ mySvg.append('rect')
       function update(section, vote) {
 
         if (section == 'intro') {
-          graphics = [presSquares, houseSquares, senateSquares, presBar, houseBar, senateBar];
+          graphics = [introPopBar, introPresBar, introHouseBar, introSenateBar];
         } else if (section == 'pres') {
-          graphics = [presSquares, presBar, popBar]
+          graphics = [presSquares, presBar, presPop]
         } else if (section == 'house') {
-          graphics = [houseSquares, houseBar]
+          graphics = [houseSquares, houseBar, housePop]
         } else if (section == 'senate') {
-          graphics = [senateSquares, senateBar]
+          graphics = [senateSquares, senateBar, senatePop]
         };
 
     		// can add transition before .style

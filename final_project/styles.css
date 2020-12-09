@@ -1,9 +1,29 @@
 
-        #intro {
-          width: 600px;
+/*        .intro {
+          width: 100%;
+          min-width: 1000px;
           margin: auto;
           margin-top: 50px;
-        }        
+        }        */
+
+        #introBlurb {
+          width: 600px;
+          margin: auto;
+        }
+
+        #introSlider {
+          margin: auto;
+          margin-bottom: 40px;
+        }
+
+        #introPop {
+          margin-bottom: 25px;          
+        }
+
+        .row {
+          width: 1030px;
+          margin: auto;
+        }
 
         .explainer {
           display: inline-block;
@@ -22,6 +42,11 @@
           display: block;
         }
 
+        .introVis {
+          display: inline-block;
+          vertical-align: top;
+        }
+
         .rect {
         	stroke: #ffffff;
         	stroke-width: 0.5px;
@@ -37,7 +62,9 @@
 
         section {
           display: block;
-          margin: 0px 50px 50px 50px;
+          width: 1030px;
+          margin: auto;
+          margin-bottom: 60px;
         }
 
         h1 {
@@ -45,6 +72,7 @@
           font-size: 42px;
           font-weight: 300;
           text-align: center;
+          margin-top: 100px;
         }
 
         h2 {
@@ -58,15 +86,34 @@
           font-size: 17px;
         }
 
+        .leftLabel {
+          width: 200px;
+          display: inline-block;
+          margin-top: 5px;
+        }
+
+        .rightLabel {
+          width: 200px;
+          display: inline-block;
+          margin-top: 5px;
+        }
+
         .sliderTitle {
           text-transform: uppercase;
           font-size: 13px;
-          font-weight: bold;
+          /*font-weight: bold;*/
           font-family: sans-serif;
           text-anchor: middle;
           fill: #000000;
         }
 
+        h3 {
+          /*text-transform: uppercase;*/
+          font-size: 14px;
+          font-weight: bold;
+          font-family: sans-serif;
+          text-align: right;
+        }
 /*        .myRect {
           fill: none;
           stroke: url(#linear-gradient);
