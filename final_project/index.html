@@ -4,17 +4,16 @@
       <meta charset="utf-8">
       <title>Slider</title>
       <script type="text/javascript" src= "https://d3js.org/d3.v6.js"></script>
-      <script type="text/javascript" src= "../d3-simple-slider.js"></script>
+      <script type="text/javascript" src= "d3-simple-slider.js"></script>
       <link rel="stylesheet" href="styles.css">
   </head>
   <body>
 
     <section>
       <h1>American Democracy Is Rigged Against Democrats</h1>
-      <div class="intro">
+      <div id="intro">
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-        <div id="slider"></div>
-        <div id="summaryResult"></div>
+        <svg id="introSlider" class="vis"></div>
       </div>
     </section>
 
@@ -24,11 +23,11 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
       </div>
-      <div class="panel">
-        <div id="presSlider"></div>
-        <div id="presResult"></div>
+      <div class="panel" id="pres">
+        <svg id="presSlider" class="vis"></svg>
         <svg id="presMap" class="vis"></svg>
         <svg id="presChart" class="vis"></svg>
+        <svg id="popChart" class="vis"></svg>
       </div>
     </section>
 
@@ -38,9 +37,8 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
       </div>
-      <div class="panel">
-        <div id="houseSlider"></div>
-        <div id="houseResult"></div>
+      <div class="panel" id="house">
+        <svg id="houseSlider" class="vis"></svg>
         <svg id="houseMap" class="vis"></svg>
         <svg id="houseChart" class="vis"></svg>
       </div>
@@ -52,9 +50,8 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
       </div>
-      <div class="panel">
-        <div id="senateSlider"></div>
-        <div id="senateResult"></div>
+      <div class="panel" id="senate">
+        <svg id="senateSlider" class="vis"></svg>
         <svg id="senateMap" class="vis"></svg>
         <svg id="senateChart" class="vis"></svg>
       </div>
@@ -63,15 +60,17 @@
     <script type="text/javascript">
     
     Promise.all([
-	    d3.csv("data/pres_data.csv"),
+      d3.csv("data/pres_data.csv"),
 	    d3.csv("data/house_data.csv"),
-	    d3.csv("data/senate_data.csv")
+	    d3.csv("data/senate_data.csv"),
+      d3.csv("data/pop_data.csv")
 	])
      .then(function(data) {
 
       const pres_data = data[0];
       const house_data = data[1];
       const senate_data = data[2];
+      const pop_data = data[3];
 
       console.log(pres_data);
       console.log(house_data);
@@ -120,10 +119,12 @@
         h: panelWidth / 87 * 5 // sets height all bar charts so that house squares will be perfectly square (house grid is 87 by 5)
       };
 
-      const introSlider = {
+      const sliderSize = {
         w: panelWidth,
         h: 150
-      }
+      };
+
+      const sliderMargin = 15;
 
 
       // SCALES
@@ -153,41 +154,149 @@
       }
 
 
-      // SLIDER
+      // SLIDER AND RESULTS
 
-     // define the slider
-     const slider = d3.sliderTop()
-        .min(voteMaxD)
-        .max(voteMaxR)
-        .default(0)
-        .step(.5)
-        .width(introSlider.w - 30)
-        // custom slider symbol
-        .handle(
-          d3.symbol()
-            .type(d3.symbolCircle)
-            .size(150)()
-          )
-        .tickValues(voteRange)
-        // remove minus signs
-        .tickFormat(Math.abs)
-        .displayValue(false)
-        // onchange, pass slider value to update function
-        .on('onchange', function (value) {
-          update(value);
-        });
+      // define function to add slider and results
+      function addSlider(section) {
 
-      // add the slider
-      d3.select('#slider')
-        .append('svg')
-        .attr('width', introSlider.w)
-        .attr('height', introSlider.h)
-        .append('g')
-        .attr('transform', 'translate(15,75)')
-        .call(slider);
+        // const sliderWidth = 0;
+        // const sliderHeight = 0;
+
+        // if (section == 'intro') {
+        //   sliderWidth = sliderSize.w;
+        //   sliderHeight = sliderSize.h;
+        // } else {
+        //   sliderWidth = panelSlider.w;
+        //   sliderHeight = panelSlider.h;
+        // };
+
+        const sliderWidth = sliderSize.w;
+        const sliderHeight = sliderSize.h;
+        // for selecting appropriate svg
+        const sliderSvg = '#' + section + 'Slider';
+
+        // define the slider
+        const slider = d3.sliderTop()
+          .min(voteMaxD)
+          .max(voteMaxR)
+          .default(0)
+          .step(.5)
+          .width(sliderWidth - sliderMargin * 2)
+          // custom slider symbol
+          .handle(
+            d3.symbol()
+              .type(d3.symbolCircle)
+              .size(150)()
+            )
+          .tickValues(voteRange)
+          .tickPadding(-3)
+          // remove minus signs
+          // .tickFormat(Math.abs)
+          .tickFormat((function (v) {
+              if (v == 0) {
+                return 'Even';
+              } else if (v < 0) {
+                return 'D +' + Math.abs(v); 
+              } else if (v > 0) {
+                return 'R +' + Math.abs(v); 
+              };
+          }))
+          .displayValue(false)
+          // onchange, pass slider value to update function
+          .on('onchange', function (value) {
+            update(section, value); // updates appropriate section
+          });
+
+        d3.select(sliderSvg)
+          .attr('width', sliderWidth)
+          .attr('height', sliderHeight)
+          .append('g')
+          .attr('transform', 'translate(' + sliderMargin + ',' + sliderSize.h / 2 + ')')
+          .call(slider);
+
+        // add slider titles
+        d3.selectAll('.slider')
+          .append('text')
+          .attr('class', 'sliderTitle')
+          .text('Popular Vote')
+          .attr('transform', 'translate(' + (sliderWidth - sliderMargin * 2) / 2 + ', -45)');
+
+        // add result titles
+        // d3.selectAll('.slider')
+        //   .append('text')
+        //   .attr('class', 'sliderTitle')
+        //   .text('Popular Vote')
+        //   .attr('transform', 'translate(' + (sliderSize.w - sliderMargin * 2) / 2 + ', -45)');
+
+      };
+
+      addSlider('intro');
+      addSlider('pres');
+      addSlider('house');
+      addSlider('senate');
 
 
-      // SVG dimensions
+///// gradient test
+
+var colorRange = ['#d7191c', '#1a9641'] //['#ffffcc', '#a1dab4', '#41b6c4', '#2c7fb8', '#253494']
+
+var color = d3.scaleLinear().range(colorRange).domain([1, 2]);
+
+var mySvg = d3.select('body')
+    .append('svg')
+    .attr("width", 500)
+    .attr("height", 500)
+    .append("g")
+    .attr("transform", "translate(" + (10) + "," + (10) + ")");
+
+var linearGradient = mySvg.append("defs")
+    .append("linearGradient")
+    .attr("id", "linear-gradient");
+
+linearGradient.append("stop")
+    .attr("offset", "0%")
+    .attr("stop-color", color(1));
+
+linearGradient.append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", color(2));
+
+mySvg.append('line')
+    .attr('x1', 10)
+    .attr('x2', 100)
+    .attr('y1', 150)
+    .attr('y2', 150)
+    .attr("stroke-width", 6)
+    .attr("stroke", "url(#linear-gradient)");
+
+mySvg.append('path')
+    .attr('d', "M 10 10 H 90 V 90 H 10 Z")
+    .attr("stroke-width", 6)
+    .attr("stroke", "url(#linear-gradient)");
+
+
+mySvg.append('rect')
+    .attr('x', 110)
+    .attr('y', 0)
+    .attr('width', 50)
+    .attr('height', 50)
+    .attr("stroke-width", 6)
+    .attr("stroke", "url(#linear-gradient)");
+
+// d3.select('#test')
+//   .attr("stroke", "url(#linear-gradient)");
+//   //.attr("stroke", "red");
+
+// //// specify slider track color
+// d3.selectAll('.track-inset')
+//   .attr("stroke", "url(#linear-gradient)");
+//   //.attr("stroke", "red");
+
+
+
+
+
+      // panel SVG dimensions
       const svg1 = d3.select('#presMap')
         .attr('width', map.w + margin.left + margin.right)
         .attr('height', map.h + margin.top + margin.bottom);
@@ -211,6 +320,12 @@
       const svg6 = d3.select('#senateChart')
         .attr('width', bar.w + margin.left + margin.right)
         .attr('height', bar.h + margin.top + margin.bottom);
+
+
+      const svg7 = d3.select('#popChart')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
+
 
       // add g for each state in appropriate position
       // const g = svg.append('g')
@@ -316,23 +431,45 @@
         .attr('height', bar.h)
         .attr('class', 'rect');
 
+
+      popBar = svg7.selectAll('rect')
+        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
+        .attr('y', margin.top)
+        .attr('width', bar.w / 400)
+        .attr('height', bar.h)
+        .attr('class', 'rect');
+
       
       // COLOR
+      let graphics = [];
 
       // function for updating colors
-      function update(vote) {
+      function update(section, vote) {
 
-      	const graphics = [presSquares, houseSquares, senateSquares, presBar, houseBar, senateBar];
+        if (section == 'intro') {
+          graphics = [presSquares, houseSquares, senateSquares, presBar, houseBar, senateBar];
+        } else if (section == 'pres') {
+          graphics = [presSquares, presBar, popBar]
+        } else if (section == 'house') {
+          graphics = [houseSquares, houseBar]
+        } else if (section == 'senate') {
+          graphics = [senateSquares, senateBar]
+        };
 
-		// can add transition before .style
-		graphics.forEach(item => item.style('fill', d => {
-			return leanColor(+d.rlean + vote);
-		}));
+    		// can add transition before .style
+    		graphics.forEach(item => item.style('fill', d => {
+    			return leanColor(+d.rlean + vote);
+    		}));
 
-	  };
+    	};
 
-	  // initial color (popular vote = 0)
-      update(0);
+      // initial colors (popular vote = 0)
+      update('intro', 0);
+      update('pres', 0);
+      update('house', 0);
+      update('senate', 0);
 
         
 
