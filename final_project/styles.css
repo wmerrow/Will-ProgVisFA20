@@ -151,16 +151,42 @@
           margin-bottom: 0px;
         }
 
+        .arrow {
+          display: inline-block;
+          margin-top: 10px;
+          margin-left: 15px;
+          margin-right: 15px;
+          vertical-align: top;
+        }
+
+        .arrowContainer {
+          margin-top: 20px;
+        }
+
+        .winnerTextIntro {
+          font-weight: bold;
+          font-size: 14px;
+          font-family: sans-serif;
+        }
+
+        .resultTextIntro {
+          font-weight: normal;
+          font-size: 12px;
+          font-family: sans-serif;
+        }
+
         .winnerText {
           font-weight: bold;
           font-size: 14px;
           font-family: sans-serif;
+          text-anchor: middle;
         }
 
         .resultText {
           font-weight: normal;
           font-size: 12px;
           font-family: sans-serif;
+          text-anchor: middle;
         }
 
 /*        .myRect {
