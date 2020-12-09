@@ -33,7 +33,7 @@
         <div class="leftLabel">
           <h3>Popular vote</h3>
         </div>
-        <svg id="introPop" class="introVis"></svg>
+        <svg id="introPop" class="introVis barStandard"></svg>
         <div class="rightLabel">
           <svg id="introPopResult" class="introVis"></svg>
         </div>
@@ -43,7 +43,7 @@
         <div class="leftLabel">
           <h3>Presidency</h3>
         </div>
-        <svg id="introPresChart" class="introVis"></svg>
+        <svg id="introPresChart" class="introVis barStandard"></svg>
         <div class="rightLabel">
           <svg id="introPresResult" class="introVis"></svg>
         </div>
@@ -53,7 +53,7 @@
         <div class="leftLabel">
           <h3>House</h3>
         </div>
-        <svg id="introHouseChart" class="introVis"></svg>
+        <svg id="introHouseChart" class="introVis barHouse"></svg>
         <div class="rightLabel">
           <svg id="introHouseResult" class="introVis"></svg>
         </div>
@@ -63,7 +63,7 @@
         <div class="leftLabel">
           <h3>Senate</h3>
         </div>
-        <svg id="introSenateChart" class="introVis"></svg>
+        <svg id="introSenateChart" class="introVis barStandard"></svg>
         <div class="rightLabel">
           <svg id="introSenateResult" class="introVis"></svg>
         </div>
@@ -82,8 +82,8 @@
       <div class="panel" id="pres">
         <svg id="presSlider" class="vis"></svg>
         <svg id="presMap" class="vis"></svg>
-        <svg id="presChart" class="vis"></svg>
-        <svg id="presPop" class="vis"></svg>
+        <svg id="presChart" class="vis barStandard"></svg>
+        <svg id="presPop" class="vis barStandard"></svg>
       </div>
     </section>
 
@@ -97,8 +97,8 @@
       <div class="panel" id="house">
         <svg id="houseSlider" class="vis"></svg>
         <svg id="houseMap" class="vis"></svg>
-        <svg id="houseChart" class="vis"></svg>
-        <svg id="housePop" class="vis"></svg>
+        <svg id="houseChart" class="vis barHouse"></svg>
+        <svg id="housePop" class="vis barStandard"></svg>
       </div>
     </section>
     
@@ -112,8 +112,8 @@
       <div class="panel" id="senate">
         <svg id="senateSlider" class="vis"></svg>
         <svg id="senateMap" class="vis"></svg>
-        <svg id="senateChart" class="vis"></svg>
-        <svg id="senatePop" class="vis"></svg>
+        <svg id="senateChart" class="vis barStandard"></svg>
+        <svg id="senatePop" class="vis barStandard"></svg>
       </div>
     </section>
 
@@ -537,7 +537,7 @@
         .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
         .attr('y', margin.top)
         .attr('width', bar.w / 400)
-        .attr('height', bar.h / 2);
+        .attr('height', bar.h);
 
       housePop = housePopSvg.selectAll('rect')
         .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
@@ -545,7 +545,7 @@
         .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
         .attr('y', margin.top)
         .attr('width', bar.w / 400)
-        .attr('height', bar.h / 2);
+        .attr('height', bar.h);
 
       senatePop = senatePopSvg.selectAll('rect')
         .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
@@ -553,7 +553,7 @@
         .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
         .attr('y', margin.top)
         .attr('width', bar.w / 400)
-        .attr('height', bar.h / 2);
+        .attr('height', bar.h);
 
       // intro bar charts
 
@@ -593,6 +593,23 @@
         .attr('width', bar.w / 100)
         .attr('height', bar.h)
         .attr('class', 'rect');   
+
+      // reference lines
+
+      const house_grid_square = bar.w / 87;
+
+      d3.selectAll('.barStandard')
+        .append('path')
+        .attr('d', 'M ' + (margin.left + bar.w / 2) + ' 5' + ' V ' + (bar.h + margin.top * 2 - 5))
+        .attr("stroke-width", 2)
+        .attr("stroke", "#000000");
+
+      d3.selectAll('.barHouse')
+        .append('path')
+        .attr('d', 'M ' + (margin.left + bar.w / 2 + house_grid_square / 2) + ' 5' + ' l 0 ' + (house_grid_square * 2 + 5) + ' l ' + (house_grid_square * -1) + ' ' + (house_grid_square) + ' l 0 ' + (house_grid_square * 2 + 5)) //(bar.h + margin.top * 2 - 5))
+        .attr("stroke-width", 2)
+        .attr("stroke", "#000000")
+        .attr('fill', 'none');
 
       // intro results
 

@@ -9,6 +9,7 @@
         #introBlurb {
           width: 600px;
           margin: auto;
+          margin-bottom: 40px;
         }
 
         #introSlider {
