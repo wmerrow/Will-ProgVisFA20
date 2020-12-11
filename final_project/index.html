@@ -35,9 +35,9 @@
         <div class="leftLabel">
           <h3>Popular vote</h3>
         </div>
-        <svg id="introPop" class="introVis barStandard"></svg>
+        <svg id="introPop" class="introVis barNonHouse bar"></svg>
         <div class="rightLabel">
-          <svg id="introPopResult" class="introVis"></svg>
+          <svg id="introPopResult" class="introVis introResult"></svg>
         </div>
       </div>
 
@@ -45,9 +45,9 @@
         <div class="leftLabel">
           <h3>Presidency</h3>
         </div>
-        <svg id="introPresChart" class="introVis barStandard"></svg>
+        <svg id="introPresChart" class="introVis barNonHouse bar"></svg>
         <div class="rightLabel">
-          <svg id="introPresResult" class="introVis"></svg>
+          <svg id="introPresResult" class="introVis introResult"></svg>
         </div>
       </div>
 
@@ -55,9 +55,9 @@
         <div class="leftLabel">
           <h3>House</h3>
         </div>
-        <svg id="introHouseChart" class="introVis barHouse"></svg>
+        <svg id="introHouseChart" class="introVis barHouse bar"></svg>
         <div class="rightLabel">
-          <svg id="introHouseResult" class="introVis"></svg>
+          <svg id="introHouseResult" class="introVis introResult"></svg>
         </div>
       </div>
 
@@ -65,9 +65,9 @@
         <div class="leftLabel">
           <h3>Senate</h3>
         </div>
-        <svg id="introSenateChart" class="introVis barStandard"></svg>
+        <svg id="introSenateChart" class="introVis barNonHouse bar"></svg>
         <div class="rightLabel">
-          <svg id="introSenateResult" class="introVis"></svg>
+          <svg id="introSenateResult" class="introVis introResult"></svg>
         </div>
       </div>
 
@@ -84,13 +84,13 @@
       <div class="panel" id="pres">
         <svg id="presSlider" class="vis sliderSvg"></svg>
         <div class="arrowContainer">
-          <svg id="presPopResult"></svg>
+          <svg id="presPopResult" class="panelResult"></svg>
           <p class="arrow">&#8594;</p>
-          <svg id="presPresResult"></svg>
+          <svg id="presPresResult" class="panelResult"></svg>
         </div>
-        <svg id="presMap" class="vis"></svg>
-        <svg id="presChart" class="vis barStandard"></svg>
-        <!-- <svg id="presPop" class="vis barStandard"></svg> -->
+        <svg id="presMap" class="vis map"></svg>
+        <svg id="presChart" class="vis barNonHouse bar"></svg>
+        <!-- <svg id="presPop" class="vis barNonHouse bar"></svg> -->
       </div>
     </section>
 
@@ -104,13 +104,13 @@
       <div class="panel" id="house">
         <svg id="houseSlider" class="vis sliderSvg"></svg>
         <div class="arrowContainer">
-          <svg id="housePopResult"></svg>
+          <svg id="housePopResult" class="panelResult"></svg>
           <p class="arrow">&#8594;</p>
-          <svg id="houseHouseResult"></svg>
+          <svg id="houseHouseResult" class="panelResult"></svg>
         </div>
-        <svg id="houseMap" class="vis"></svg>
-        <svg id="houseChart" class="vis barHouse"></svg>
-        <!-- <svg id="housePop" class="vis barStandard"></svg> -->
+        <svg id="houseMap" class="vis map"></svg>
+        <svg id="houseChart" class="vis barHouse bar"></svg>
+        <!-- <svg id="housePop" class="vis barNonHouse bar"></svg> -->
       </div>
     </section>
     
@@ -124,13 +124,13 @@
       <div class="panel" id="senate">
         <svg id="senateSlider" class="vis sliderSvg"></svg>
         <div class="arrowContainer">
-          <svg id="senatePopResult"></svg>
+          <svg id="senatePopResult" class="panelResult"></svg>
           <p class="arrow">&#8594;</p>
-          <svg id="senateSenateResult"></svg>
+          <svg id="senateSenateResult" class="panelResult"></svg>
         </div>
-        <svg id="senateMap" class="vis"></svg>
-        <svg id="senateChart" class="vis barStandard"></svg>
-        <!-- <svg id="senatePop" class="vis barStandard"></svg> -->
+        <svg id="senateMap" class="vis map"></svg>
+        <svg id="senateChart" class="vis barNonHouse bar"></svg>
+        <!-- <svg id="senatePop" class="vis barNonHouse bar"></svg> -->
       </div>
     </section>
 
@@ -187,42 +187,43 @@
         h: squareScale * 7
       };
 
-      // panel dimensions
+      // panels and graphics
 
       const panelWidth = 600;
 
-      const map = {
-        w: panelWidth, // width of map
-        h: panelWidth * 0.61835245046 // map aspect ratio
+      const result = {
+        w: 200,
+        h: 40
       };
-
+      const map = {
+        w: panelWidth,
+        h: panelWidth * 0.61835245046 // height maintains map image aspect ratio
+      };
       const bar = {
-        w: panelWidth, // width of map
+        w: panelWidth,
         h: panelWidth / 87 * 5 // sets height all bar charts so that house squares will be perfectly square (house grid is 87 by 5)
       };
-
       const sliderSize = {
         w: panelWidth * 0.75,
         h: 50
       };
-
       const sliderMargin = 15;
 
 
       // SCALES
 
-      const red = '#cf4938';
-      const blue = '#4e81cf';
-      const gray = '#555555';
+      const red = '#cf2e23';
+      const blue = '#1b67c4';
+      const gray = '#666666';
 
-      // color scale
+      // color scale - red if leans republican, blue if leans democrat or tie
       const leanColor = d3.scaleThreshold()
         .domain([0]) // split at 0
-        .range([blue, red]);
+        .range([red, blue]); // takes inverted rlean so that 0 translates to a Democrat win instead of Republican win, to be generous about level of bias
 
       // pres state size scale
       const presSize = d3.scaleSqrt()
-      	.domain([0, 55]) // max electoral votes is 55 (California)
+      	.domain([0, d3.max(pres_data, d => +d.electors)])
       	.range([0, pres_square.w]);
       
       // slider min/max
@@ -239,23 +240,10 @@
 
       // SLIDER AND RESULTS
 
-      // define function to add slider and results
+      // function to add slider
       function addSlider(section) {
 
-        // const sliderWidth = 0;
-        // const sliderHeight = 0;
-
-        // if (section == 'intro') {
-        //   sliderWidth = sliderSize.w;
-        //   sliderHeight = sliderSize.h;
-        // } else {
-        //   sliderWidth = panelSlider.w;
-        //   sliderHeight = panelSlider.h;
-        // };
-
-        const sliderWidth = sliderSize.w;
-        const sliderHeight = sliderSize.h;
-        // for selecting appropriate svg
+        // concatenate the appropriate svg id
         const sliderSvg = '#' + section + 'Slider';
 
         // define the slider
@@ -263,8 +251,8 @@
           .min(voteMaxD)
           .max(voteMaxR)
           .default(0)
-          .step(.5)
-          .width(sliderWidth - sliderMargin * 2)
+          .step(.5) // step between selectable values
+          .width(sliderSize.w - sliderMargin * 2)
           // custom slider symbol
           .handle(
             d3.symbol()
@@ -273,8 +261,7 @@
             )
           .tickValues(voteRange)
           .tickPadding(-3)
-          // remove minus signs
-          // .tickFormat(Math.abs)
+          // remove minus signs and append +D or +R, or change to Even
           .tickFormat((function (v) {
               if (v == 0) {
                 return 'Even';
@@ -285,201 +272,89 @@
               };
           }))
           .displayValue(false)
-          // onchange, pass slider value to update function
+          // onchange, pass section and slider value to update function to update graphics
           .on('onchange', function (value) {
-            update(section, value); // updates appropriate section
+            update(section, value);
           });
 
         d3.select(sliderSvg)
-          .attr('width', sliderWidth)
-          .attr('height', sliderHeight)
+          .attr('width', sliderSize.w)
+          .attr('height', sliderSize.h)
           .append('g')
           .attr('transform', 'translate(' + sliderMargin + ',' + (sliderSize.h - 10) + ')')
           .call(slider);
 
-        // add slider titles
+        // add slider title
         // d3.select('#introSlider')
         //   .append('text')
         //   .attr('class', 'sliderTitle')
         //   .text('Scenario')
         //   .attr('transform', 'translate(' + (sliderWidth) / 2 + ', 21)');
 
-        // add result titles
-        // d3.selectAll('.slider')
-        //   .append('text')
-        //   .attr('class', 'sliderTitle')
-        //   .text('Popular Vote')
-        //   .attr('transform', 'translate(' + (sliderSize.w - sliderMargin * 2) / 2 + ', -45)');
-
       };
 
+      // add sliders to each section
       addSlider('intro');
       addSlider('pres');
       addSlider('house');
       addSlider('senate');
 
 
-///// gradient test
-
-// var colorRange = ['#d7191c', '#1a9641'] //['#ffffcc', '#a1dab4', '#41b6c4', '#2c7fb8', '#253494']
-
-// var color = d3.scaleLinear().range(colorRange).domain([1, 2]);
-
-// var mySvg = d3.select('body')
-//     .append('svg')
-//     .attr("width", 500)
-//     .attr("height", 500)
-//     .append("g")
-//     .attr("transform", "translate(" + (10) + "," + (10) + ")");
-
-// var linearGradient = mySvg.append("defs")
-//     .append("linearGradient")
-//     .attr("id", "linear-gradient");
-
-// linearGradient.append("stop")
-//     .attr("offset", "0%")
-//     .attr("stop-color", color(1));
-
-// linearGradient.append("stop")
-//     .attr("offset", "100%")
-//     .attr("stop-color", color(2));
-
-// mySvg.append('line')
-//     .attr('x1', 10)
-//     .attr('x2', 100)
-//     .attr('y1', 150)
-//     .attr('y2', 150)
-//     .attr("stroke-width", 6)
-//     .attr("stroke", "url(#linear-gradient)");
-
-// mySvg.append('path')
-//     .attr('d', "M 10 10 H 90 V 90 H 10 Z")
-//     .attr("stroke-width", 6)
-//     .attr("stroke", "url(#linear-gradient)");
-
-// mySvg.append('rect')
-//     .attr('x', 110)
-//     .attr('y', 0)
-//     .attr('width', 50)
-//     .attr('height', 50)
-//     .attr("stroke-width", 6)
-//     .attr("stroke", "url(#linear-gradient)");
-
-
-
-// d3.select('#test')
-//   .attr("stroke", "url(#linear-gradient)");
-//   //.attr("stroke", "red");
-
-// //// specify slider track color
-// d3.selectAll('.track-inset')
-//   .attr("stroke", "url(#linear-gradient)");
-//   //.attr("stroke", "red");
-
-
-
-
-
       // SVG dimensions
 
-      const result = {
-        w: 200,
-        h: 40
-      };
-
-      // intro chart SVGs
-      const introPopSvg = d3.select('#introPop')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-      const introPresBarSvg = d3.select('#introPresChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-      const introHouseBarSvg = d3.select('#introHouseChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-      const introSenateBarSvg = d3.select('#introSenateChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-
-      const introPopResultSvg = d3.select('#introPopResult')
-        .attr('width', result.w)
-        .attr('height', result.h);
-      const introPresResultSvg = d3.select('#introPresResult')
-        .attr('width', result.w)
-        .attr('height', result.h);
-      const introHouseResultSvg = d3.select('#introHouseResult')
-        .attr('width', result.w)
-        .attr('height', result.h);
-      const introSenateResultSvg = d3.select('#introSenateResult')
+      // intro result text
+      d3.selectAll('.introResult')
         .attr('width', result.w)
         .attr('height', result.h);
 
-      const presPopResultSvg = d3.select('#presPopResult')
-        .attr('width', 282)
-        .attr('height', result.h);
-      const presPresResultSvg = d3.select('#presPresResult')
-        .attr('width', 282)
+      const introPopResultSvg = d3.select('#introPopResult');
+      const introPresResultSvg = d3.select('#introPresResult');
+      const introHouseResultSvg = d3.select('#introHouseResult');
+      const introSenateResultSvg = d3.select('#introSenateResult');
+
+      // panel result text
+      d3.selectAll('.panelResult')
+      .attr('width', panelWidth * 0.47)
         .attr('height', result.h);
 
-      const housePopResultSvg = d3.select('#housePopResult')
-        .attr('width', 282)
-        .attr('height', result.h);
-      const houseHouseResultSvg = d3.select('#houseHouseResult')
-        .attr('width', 282)
-        .attr('height', result.h);
+      const presPopResultSvg = d3.select('#presPopResult');
+      const presPresResultSvg = d3.select('#presPresResult');
+      const housePopResultSvg = d3.select('#housePopResult');
+      const houseHouseResultSvg = d3.select('#houseHouseResult');
+      const senatePopResultSvg = d3.select('#senatePopResult');
+      const senateSenateResultSvg = d3.select('#senateSenateResult');
 
-      const senatePopResultSvg = d3.select('#senatePopResult')
-        .attr('width', 282)
-        .attr('height', result.h);
-      const senateSenateResultSvg = d3.select('#senateSenateResult')
-        .attr('width', 282)
-        .attr('height', result.h);
+      // bar charts
+      d3.selectAll('.bar')
+        .attr('width', bar.w + margin.left + margin.right)
+        .attr('height', bar.h + margin.top + margin.bottom);
 
-      // panel chart SVGs
-      const presBarSvg = d3.select('#presChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-      const houseBarSvg = d3.select('#houseChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-      const senateBarSvg = d3.select('#senateChart')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-      const presPopSvg = d3.select('#presPop')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-      const housePopSvg = d3.select('#housePop')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
-      const senatePopSvg = d3.select('#senatePop')
-        .attr('width', bar.w + margin.left + margin.right)
-        .attr('height', bar.h + margin.top + margin.bottom);
+      const introPopSvg = d3.select('#introPop');
+      const introPresBarSvg = d3.select('#introPresChart');
+      const introHouseBarSvg = d3.select('#introHouseChart');
+      const introSenateBarSvg = d3.select('#introSenateChart');
+
+      const presBarSvg = d3.select('#presChart');
+      const houseBarSvg = d3.select('#houseChart');
+      const senateBarSvg = d3.select('#senateChart');
+
+      // const presPopSvg = d3.select('#presPop');
+      // const housePopSvg = d3.select('#housePop');
+      // const senatePopSvg = d3.select('#senatePop');
       
-      // panel map SVGs
-      const presMapSvg = d3.select('#presMap')
-        .attr('width', map.w + margin.left + margin.right)
-        .attr('height', map.h + margin.top + margin.bottom);
-      const houseMapSvg = d3.select('#houseMap')
-        .attr('width', map.w + margin.left + margin.right)
-        .attr('height', map.h + margin.top + margin.bottom);
-      const senateMapSvg = d3.select('#senateMap')
+      // maps
+      d3.selectAll('.map')
         .attr('width', map.w + margin.left + margin.right)
         .attr('height', map.h + margin.top + margin.bottom);
 
-
-      // add g for each state in appropriate position
-      // const g = svg.append('g')
-      //   .selectAll('g')
-      //   .data(data)
-      //   .enter()
-      //   .append('g')
-      //   .attr('transform', d=>{return 'translate(' + (d.col * square.w + margin.left) + ',' + (d.row * square.h + margin.top) + ')';});
+      const presMapSvg = d3.select('#presMap');
+      const houseMapSvg = d3.select('#houseMap');
+      const senateMapSvg = d3.select('#senateMap');
 
 
       // MAPS
 
-      // basemaps
-
+      // function for adding basemaps
       const basemap = function (svg) {
 	      svg.append("svg:image")
 		    .attr("xlink:href", "media/us_map.svg")
@@ -488,11 +363,12 @@
 		    .attr("y",margin.top);
   		};
 
-  	  basemap(presMapSvg);
+  	  // add basemaps
+      basemap(presMapSvg);
   	  basemap(houseMapSvg);
   	  basemap(senateMapSvg);
 
-      // squares for maps
+      // add squares for maps
 
       presSquares = presMapSvg.selectAll('rect')
         .data(pres_data)
@@ -526,25 +402,63 @@
 
       // BAR CHARTS
 
+      // pop charts
+
+      // presPop = presPopSvg.selectAll('rect')
+      //   .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+      //   .join('rect')
+      //   .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
+      //   .attr('y', margin.top)
+      //   .attr('width', bar.w / 400)
+      //   .attr('height', bar.h);
+
+      // housePop = housePopSvg.selectAll('rect')
+      //   .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+      //   .join('rect')
+      //   .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
+      //   .attr('y', margin.top)
+      //   .attr('width', bar.w / 400)
+      //   .attr('height', bar.h);
+
+      // senatePop = senatePopSvg.selectAll('rect')
+      //   .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+      //   .join('rect')
+      //   .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
+      //   .attr('y', margin.top)
+      //   .attr('width', bar.w / 400)
+      //   .attr('height', bar.h);
+
+
       // function for stacking data (for pres bar chart)
       const myStack = function (dataToStack) {
-		  const total = d3.sum(dataToStack, d => d.electors);
-		  let stackPosition = 0;
-		  return dataToStack.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean))
-		  	.map(d => ({
-			    state: d.state,
-			    col: d.col,
-			    row: d.row,
-			    rlean: d.rlean,
-			    electors: +d.electors,
-			    startPosition: stackPosition,
-			    endPosition: (stackPosition += +d.electors)
-		  	}));
-	  };
+        const total = d3.sum(dataToStack, d => d.electors);
+        let stackPosition = 0;
+        return dataToStack.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean))
+          .map(d => ({
+            state: d.state,
+            col: d.col,
+            row: d.row,
+            rlean: d.rlean,
+            electors: +d.electors,
+            startPosition: stackPosition,
+            endPosition: (stackPosition += +d.electors)
+          }));
+      };
 
-      // panel bar charts
+      // function for charts on specified svg
 
-      presBar = presBarSvg.selectAll('rect')
+      function drawPopBar(svg) {
+        svg.selectAll('rect')
+        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
+        .join('rect')
+        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
+        .attr('y', margin.top)
+        .attr('width', bar.w / 400)
+        .attr('height', bar.h);
+      };
+
+      function drawPresBar(svg) {
+        svg.selectAll('rect')
         .data(myStack(pres_data)) // uses stacked data
         .join('rect')
         .attr('x', d=> d.startPosition / 538 * bar.w + margin.left)
@@ -553,8 +467,10 @@
         .attr('height', bar.h)
         //.attr('vector-effect', 'non-scaling-stroke')
         .attr('class', 'rect');
+      };
 
-      houseBar = houseBarSvg.selectAll('rect')
+      function drawHouseBar(svg) {
+        svg.selectAll('rect')
         .data(house_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
         .join('rect')
         // determine x and y, wrapping from one column to the next (wrap to next column after 5 squares)
@@ -563,8 +479,10 @@
         .attr('width', bar.w / 87)
         .attr('height', bar.h / 5)
         .attr('class', 'rect');
+      };
 
-      senateBar = senateBarSvg.selectAll('rect')
+      function drawSenateBar(svg) {
+        svg.selectAll('rect')
         .data(senate_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
         .join('rect')
         .attr('x', (d, i)=> i * bar.w / 100 + margin.left)
@@ -572,87 +490,37 @@
         .attr('width', bar.w / 100)
         .attr('height', bar.h)
         .attr('class', 'rect');
+      };
 
-      presPop = presPopSvg.selectAll('rect')
-        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
-        .join('rect')
-        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
-        .attr('y', margin.top)
-        .attr('width', bar.w / 400)
-        .attr('height', bar.h);
+      // draw bar charts
 
-      housePop = housePopSvg.selectAll('rect')
-        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
-        .join('rect')
-        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
-        .attr('y', margin.top)
-        .attr('width', bar.w / 400)
-        .attr('height', bar.h);
+      drawPopBar(introPopSvg);
 
-      senatePop = senatePopSvg.selectAll('rect')
-        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
-        .join('rect')
-        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
-        .attr('y', margin.top)
-        .attr('width', bar.w / 400)
-        .attr('height', bar.h);
+      drawPresBar(introPresBarSvg);
+      drawPresBar(presBarSvg);
 
-      // intro bar charts
+      drawHouseBar(introHouseBarSvg);
+      drawHouseBar(houseBarSvg);
 
-      introPopBar = introPopSvg.selectAll('rect')
-        .data(pop_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
-        .join('rect')
-        .attr('x', (d, i)=> i * bar.w / 400 + margin.left)
-        .attr('y', margin.top)
-        .attr('width', bar.w / 400)
-        .attr('height', bar.h);
+      drawSenateBar(introSenateBarSvg);
+      drawSenateBar(senateBarSvg);
 
-      introPresBar = introPresBarSvg.selectAll('rect')
-        .data(myStack(pres_data)) // uses stacked data
-        .join('rect')
-        .attr('x', d=> d.startPosition / 538 * bar.w + margin.left)
-        .attr('y', margin.top)
-        .attr('width', d=> d.electors / 538 * bar.w)
-        .attr('height', bar.h)
-        //.attr('vector-effect', 'non-scaling-stroke')
-        .attr('class', 'rect');
 
-      introHouseBar = introHouseBarSvg.selectAll('rect')
-        .data(house_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
-        .join('rect')
-        // determine x and y, wrapping from one column to the next (wrap to next column after 5 squares)
-        .attr('x', (d, i)=>{return Math.floor(i / 5) * bar.w / 87 + margin.left;}) // use math.floor to determine column
-        .attr('y', (d, i)=>{return (i % 5) * bar.h / 5 + margin.top;}) // use modulo to determine row
-        .attr('width', bar.w / 87)
-        .attr('height', bar.h / 5)
-        .attr('class', 'rect');
-
-      introSenateBar = introSenateBarSvg.selectAll('rect')
-        .data(senate_data.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean)))
-        .join('rect')
-        .attr('x', (d, i)=> i * bar.w / 100 + margin.left)
-        .attr('y', margin.top)
-        .attr('width', bar.w / 100)
-        .attr('height', bar.h)
-        .attr('class', 'rect');   
-
-      // reference lines
+      // majority lines
 
       const house_grid_square = bar.w / 87;
 
-      d3.selectAll('.barStandard')
+      // non-house bars
+      d3.selectAll('.barNonHouse')
         .append('path')
-        .attr('d', 'M ' + (margin.left + bar.w / 2) + ' 5' + ' V ' + (bar.h + margin.top * 2 - 5))
-        .attr("stroke-width", 2)
-        .attr("stroke", "#000000")
-        .attr('fill', 'none');
+        .attr('class', 'majorityLine')
+        .attr('d', 'M ' + (margin.left + bar.w / 2) + ' 5' + ' V ' + (bar.h + margin.top * 2 - 5));
 
+      // house bars
       d3.selectAll('.barHouse')
         .append('path')
-        .attr('d', 'M ' + (margin.left + bar.w / 2 + house_grid_square / 2) + ' 5' + ' l 0 ' + (house_grid_square * 2 + 5) + ' l ' + (house_grid_square * -1) + ' ' + (house_grid_square) + ' l 0 ' + (house_grid_square * 2 + 5)) //(bar.h + margin.top * 2 - 5))
-        .attr("stroke-width", 2)
-        .attr("stroke", "#000000")
-        .attr('fill', 'none');
+        .attr('class', 'majorityLine')
+        .attr('d', 'M ' + (margin.left + bar.w / 2 + house_grid_square / 2) + ' 5' + ' l 0 ' + (house_grid_square * 2 + 5) + ' l ' + (house_grid_square * -1) + ' ' + (house_grid_square) + ' l 0 ' + (house_grid_square * 2 + 5)); //(bar.h + margin.top * 2 - 5))
 
       // d3.select('#introPop')
       //   .append('text')
@@ -833,47 +701,45 @@
 
       // UPDATE DATA
 
-      let graphics = [];
-      let results = [];
+      // function for updating map/bar colors and result numbers (called by slider change)
 
-      // function for updating colors
       function update(section, vote) {
+
+        let graphics = [];
+
+        const introPopBar = introPopSvg.selectAll('rect');
+        const introPresBar = introPresBarSvg.selectAll('rect');
+        const introHouseBar = introHouseBarSvg.selectAll('rect');
+        const introSenateBar = introSenateBarSvg.selectAll('rect');
+        const presBar = presBarSvg.selectAll('rect');
+        const houseBar = houseBarSvg.selectAll('rect');
+        const senateBar = senateBarSvg.selectAll('rect');
 
         // determine which graphics to update
         if (section == 'intro') {
           graphics = [introPopBar, introPresBar, introHouseBar, introSenateBar];
         } else if (section == 'pres') {
-          graphics = [presSquares, presBar, presPop]
+          graphics = [presSquares, presBar] //, presPop]
         } else if (section == 'house') {
-          graphics = [houseSquares, houseBar, housePop]
+          graphics = [houseSquares, houseBar] //, housePop]
         } else if (section == 'senate') {
-          graphics = [senateSquares, senateBar, senatePop]
+          graphics = [senateSquares, senateBar] //, senatePop]
         };
 
         // update colors
         graphics.forEach(item => item.style('fill', d => {
-    			return leanColor(+d.rlean + vote);
+    			return leanColor((+d.rlean + vote) * -1); // multiplying by -1 inverts to feed into leanColor so that Democrats win ties
     		}));
 
-        // calculate which party won the presidency/house/senate and how many votes/seats they won
-
-        // R popular vote share (400 rows in popular vote data file)
-        const popResultR = d3.count(
-          pop_data, d => {if (+d.rlean + vote > 0) {return 1;}}) / 400;
+        // calculate Republicans' popular vote share, electoral college votes, house seats, and senate seats
+        // assumes democrats win ties to be generous
         
-        // R electoral college votes
-        const presResultR = d3.sum(
-          pres_data, d => {if (+d.rlean + vote > 0) {return d.electors;}});
-
-        // R house seats
-        const houseResultR = d3.count(
-          house_data, d => {if (+d.rlean + vote > 0) {return 1;}});
+        const popResultR = d3.sum(pop_data, d => {if (+d.rlean + vote > 0) {return 1;}}) / 400; // (400 rows in popular vote data file)
+        const presResultR = d3.sum(pres_data, d => {if (+d.rlean + vote > 0) {return d.electors;}});
+        const houseResultR = d3.sum(house_data, d => {if (+d.rlean + vote > 0) {return 1;}});        
+        const senateResultR = d3.sum(senate_data, d => {if (+d.rlean + vote > 0) {return 1;}});
         
-        // R senate seats
-        const senateResultR = d3.count(
-          senate_data, d => {if (+d.rlean + vote > 0) {return 1;}});
-        
-        // determine winners
+        // determine winner text
 
         let popWinner, presWinner, houseWinner, senateWinner = '';
 
@@ -908,6 +774,7 @@
         };
 
         // determine which results to update
+        // let results = [];
         // results = [introPopResult, introPopWinner, introPresResult, introHouseResult, introSenateResult];
 
         if (section == 'intro'){
@@ -1204,68 +1071,22 @@
 
 
 
-                // results.forEach(item => item.style('fill', d => {
+        // results.forEach(item => item.style('fill', d => {
         //   return leanColor(+d.rlean + vote);
         // }));
 
-        // do leanColor but with gray for ties
-
-        ////// do data calculations in the slider function and pass the output along with vote?
 
     	};
 
-      // initial colors (popular vote = 0)
+      // initial results and colors (popular vote = 0)
       update('intro', 0);
       update('pres', 0);
       update('house', 0);
       update('senate', 0);
 
-        
-
-
-
-      // TEST labels
-      // g.append('text')
-      //   .attr('x', square.w / 2)
-      //   .attr('y', square.h / 2)
-      //   .style('text-anchor', 'middle')
-      //   .attr('transform', 'translate(0,5)')
-      //   .style('fill', '#ffffff')
-      //   .attr('class', 'label')
-      //   .text(d=> {return d.rlean;});
-
-
-      // NOTES
-
-      // could also try using if instead of leanColor in case it gives better performance:
-      // if (d.rlean >= 0) {
-      //   return '#cf4938';
-      // } else {
-      //   return '#4287f5';
-      // }
-
-        const TESTpopResultR = d3.count(
-          pop_data, d => {if (+d.rlean + 0 > 0) {return d.id;}}) / 400;
-        console.log(TESTpopResultR);
-
-        // R electoral college votes
-        const TESTpresResultR = d3.sum(
-          pres_data, d => {if (+d.rlean + 0 > 0) {return d.electors;}});
-        console.log(TESTpresResultR);
-
-        // R house seats
-        const TESThouseResultR = d3.count(
-          house_data, d => {if (+d.rlean + 0 > 0) {return d.rlean;}});
-        console.log(TESThouseResultR);
-        
-        // R senate seats
-        const TESTsenateResultR = d3.count(
-          senate_data, d => {if (+d.rlean + 0 > 0) {return d.rlean;}});
-        console.log(TESTsenateResultR);
 
     })
         .catch(function(error){
-          // handle error 
           console.log(error);
     });
 
