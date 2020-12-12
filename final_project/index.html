@@ -10,9 +10,7 @@
   <body>
 
     <section>
-
       <h1>American Democracy Is Rigged Against Democrats</h1>
-      
       <div id="introBlurb">
         <div class="byline">
           <p class="bylineP">By Will Merrow</p>
@@ -24,53 +22,29 @@
         <p>The graphics below show the outcome under different popular vote scenarios, imagining that states and districts vote according to whether they lean Democrat or Republican after including the popular vote scenario. For example, in a "D +3" scenario, Democrats would win a state like Pennsylvania even though it leans more Republican than the average.</p>
         <p>Use the slider to see how different scenarios lead to different outcomes, and read on to understand why Republicans have such a strong built-in advantage.</p>
       </div> 
-
       <div class="row">  
-        <h4>Choose a scenario</h4>
+        <!-- <h4>Choose a scenario</h4> -->
         <svg id="introSlider" class="vis sliderSvg"></svg>
       </div>
-
       <div class="row">
-        <p class="majorityLabel">Majority</p>
-        <div class="leftLabel">
-          <h3>Popular vote</h3>
-        </div>
+        <svg id="introPopResult" class="introVis introResult intro"></svg>
         <svg id="introPop" class="introVis barNonHouse intro bar"></svg>
-        <div class="rightLabel">
-          <svg id="introPopResult" class="introVis introResult intro"></svg>
-        </div>
       </div>
-
-      <div class="row">
-        <div class="leftLabel">
-          <h3>Presidency</h3>
-        </div>
-        <svg id="introPresChart" class="introVis barNonHouse intro bar"></svg>
-        <div class="rightLabel">
+      <h5>&darr;</h5>
+      <div id="introResults">
+        <div class="row">
           <svg id="introPresResult" class="introVis introResult intro"></svg>
+          <svg id="introPresChart" class="introVis barNonHouse intro bar"></svg>
         </div>
-      </div>
-
-      <div class="row">
-        <div class="leftLabel">
-          <h3>House</h3>
-        </div>
-        <svg id="introHouseChart" class="introVis barHouse intro bar"></svg>
-        <div class="rightLabel">
+        <div class="row">
           <svg id="introHouseResult" class="introVis introResult intro"></svg>
+          <svg id="introHouseChart" class="introVis barHouse intro bar"></svg>
         </div>
-      </div>
-
-      <div class="row">
-        <div class="leftLabel">
-          <h3>Senate</h3>
-        </div>
-        <svg id="introSenateChart" class="introVis barNonHouse intro bar"></svg>
-        <div class="rightLabel">
+        <div class="row">
           <svg id="introSenateResult" class="introVis introResult intro"></svg>
+          <svg id="introSenateChart" class="introVis barNonHouse intro bar"></svg>
         </div>
       </div>
-
     </section>
 
     <section>
@@ -85,12 +59,11 @@
         <svg id="presSlider" class="vis sliderSvg"></svg>
         <div class="arrowContainer">
           <svg id="presPopResult" class="panelResult pres"></svg>
-          <p class="arrow">&#8594;</p>
+          <h5>&darr;</h5>
           <svg id="presPresResult" class="panelResult pres"></svg>
         </div>
         <svg id="presMap" class="vis pres map"></svg>
         <svg id="presChart" class="vis barNonHouse pres bar"></svg>
-        <!-- <svg id="presPop" class="vis barNonHouse bar"></svg> -->
       </div>
     </section>
 
@@ -105,12 +78,11 @@
         <svg id="houseSlider" class="vis sliderSvg"></svg>
         <div class="arrowContainer">
           <svg id="housePopResult" class="panelResult house"></svg>
-          <p class="arrow">&#8594;</p>
+          <h5>&darr;</h5>
           <svg id="houseHouseResult" class="panelResult house"></svg>
         </div>
         <svg id="houseMap" class="vis house map"></svg>
         <svg id="houseChart" class="vis barHouse house bar"></svg>
-        <!-- <svg id="housePop" class="vis barNonHouse bar"></svg> -->
       </div>
     </section>
     
@@ -125,12 +97,11 @@
         <svg id="senateSlider" class="vis sliderSvg"></svg>
         <div class="arrowContainer">
           <svg id="senatePopResult" class="panelResult senate"></svg>
-          <p class="arrow">&#8594;</p>
+          <h5>&darr;</h5>
           <svg id="senateSenateResult" class="panelResult senate"></svg>
         </div>
         <svg id="senateMap" class="vis senate map"></svg>
         <svg id="senateChart" class="vis barNonHouse senate bar"></svg>
-        <!-- <svg id="senatePop" class="vis barNonHouse bar"></svg> -->
       </div>
     </section>
 
@@ -180,16 +151,16 @@
 
       // panels
 
-      const panelWidth = 600;
+      const panelWidth = 550;
       const margin = {
-        top: 10,
+        top: 5,
         right: 10,
-        bottom: 10,
+        bottom: 5,
         left: 10
       };
       const result = {
-        w: 200,
-        h: 40
+        w: panelWidth,
+        h: 35
       };
       const map = {
         w: panelWidth,
@@ -301,12 +272,12 @@
 
       // intro result text
       d3.selectAll('.introResult')
-        .attr('width', result.w)
+        .attr('width', result.w + margin.left + margin.right)
         .attr('height', result.h);
 
       // panel result text
       d3.selectAll('.panelResult')
-        .attr('width', panelWidth * 0.47)
+        .attr('width', result.w + margin.left + margin.right)
         .attr('height', result.h);
 
       // bar charts
@@ -481,12 +452,12 @@
       d3.selectAll('.barNonHouse')
         .append('path')
         .attr('class', 'majorityLine')
-        .attr('d', 'M ' + (margin.left + bar.w / 2) + ' 5' + ' V ' + (bar.h + margin.top * 2 - 5));
+        .attr('d', 'M ' + (margin.left + bar.w / 2) + ' 0' + ' V ' + (bar.h + margin.top + margin.bottom));
 
       d3.selectAll('.barHouse')
         .append('path')
         .attr('class', 'majorityLine')
-        .attr('d', 'M ' + (margin.left + bar.w / 2 + house_grid_square / 2) + ' 5' + ' l 0 ' + (house_grid_square * 2 + 5) + ' l ' + (house_grid_square * -1) + ' ' + (house_grid_square) + ' l 0 ' + (house_grid_square * 2 + 5)); //(bar.h + margin.top * 2 - 5))
+        .attr('d', 'M ' + (margin.left + bar.w / 2 + house_grid_square / 2) + ' 0' + ' l 0 ' + (margin.top + house_grid_square * 2) + ' l ' + (house_grid_square * -1) + ' ' + (house_grid_square) + ' l 0 ' + (house_grid_square * 2 + margin.bottom)); //(bar.h + margin.top * 2 - 5))
 
       // d3.select('#introPop')
       //   .append('text')
@@ -505,14 +476,14 @@
       function drawResult(type, svg) {
         d3.select(svg).append('text')
           .attr('class', 'winnerText ' + type + 'WinnerText')
-          .attr('x', result.w / 2)
-          .attr('y', 15)
+          .attr('x', result.w / 2 + margin.left)
+          .attr('y', 13)
           .style('fill', 'green') // gets populated by update function
           .text(''); // gets populated by update function
         d3.select(svg).append('text')
           .attr('class', 'resultText ' + type + 'ResultText')
-          .attr('x', result.w / 2)
-          .attr('y', 32)
+          .attr('x', result.w / 2 + margin.left)
+          .attr('y', 31)
           .style('fill', 'green') // gets populated by update function
           .text(''); // gets populated by update function
       };
