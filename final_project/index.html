@@ -23,7 +23,7 @@
         <p>Use the slider to see how different scenarios lead to different outcomes, and read on to understand why Republicans have such a strong built-in advantage.</p>
       </div> 
       <div class="row">  
-        <!-- <h4>Choose a scenario</h4> -->
+        <h4>Scenario</h4>
         <svg id="introSlider" class="vis sliderSvg"></svg>
       </div>
       <div class="row">
@@ -137,21 +137,21 @@
       const squareScale = 1.5
 
       const pres_square = {
-        w: squareScale * 30,
-        h: squareScale * 30
+        w: squareScale * 26,
+        h: squareScale * 26
       };
       const house_square = {
         w: squareScale * 4,
         h: squareScale * 4
       };
       const senate_square = {
-        w: squareScale * 7,
-        h: squareScale * 7
+        w: squareScale * 6.5,
+        h: squareScale * 6.5
       };
 
       // panels
 
-      const panelWidth = 550;
+      const panelWidth = 560;
       const margin = {
         top: 5,
         right: 10,
@@ -375,8 +375,6 @@
         return dataToStack.sort((a,b)=>d3.ascending(+a.rlean, +b.rlean))
           .map(d => ({
             state: d.state,
-            col: d.col,
-            row: d.row,
             rlean: d.rlean,
             electors: +d.electors,
             startPosition: stackPosition,
