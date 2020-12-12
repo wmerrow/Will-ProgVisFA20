@@ -297,56 +297,27 @@
       addSlider('senate');
 
 
-      // SVG DIMENSIONS AND SELECTIONS
+      // SVG DIMENSIONS
 
       // intro result text
       d3.selectAll('.introResult')
         .attr('width', result.w)
         .attr('height', result.h);
 
-      const introPopResultSvg = d3.select('#introPopResult');
-      const introPresResultSvg = d3.select('#introPresResult');
-      const introHouseResultSvg = d3.select('#introHouseResult');
-      const introSenateResultSvg = d3.select('#introSenateResult');
-
       // panel result text
       d3.selectAll('.panelResult')
         .attr('width', panelWidth * 0.47)
         .attr('height', result.h);
 
-      const presPopResultSvg = d3.select('#presPopResult');
-      const presPresResultSvg = d3.select('#presPresResult');
-      const housePopResultSvg = d3.select('#housePopResult');
-      const houseHouseResultSvg = d3.select('#houseHouseResult');
-      const senatePopResultSvg = d3.select('#senatePopResult');
-      const senateSenateResultSvg = d3.select('#senateSenateResult');
-
       // bar charts
       d3.selectAll('.bar')
         .attr('width', bar.w + margin.left + margin.right)
         .attr('height', bar.h + margin.top + margin.bottom);
-
-      // const introPopSvg = d3.select('#introPop');
-      // const introPresBarSvg = d3.select('#introPresChart');
-      // const introHouseBarSvg = d3.select('#introHouseChart');
-      // const introSenateBarSvg = d3.select('#introSenateChart');
-
-      // const presBarSvg = d3.select('#presChart');
-      // const houseBarSvg = d3.select('#houseChart');
-      // const senateBarSvg = d3.select('#senateChart');
-
-      // const presPopSvg = d3.select('#presPop');
-      // const housePopSvg = d3.select('#housePop');
-      // const senatePopSvg = d3.select('#senatePop');
       
       // maps
       d3.selectAll('.map')
         .attr('width', map.w + margin.left + margin.right)
         .attr('height', map.h + margin.top + margin.bottom);
-
-      // const presMapSvg = d3.select('#presMap');
-      // const houseMapSvg = d3.select('#houseMap');
-      // const senateMapSvg = d3.select('#senateMap');
 
 
       // MAPS
@@ -530,203 +501,39 @@
 
 
       // function for adding winner messages and result numbers
-      /// add another param?
-      function drawResult(svg) {
-        svg.append('text')
-          .attr('class', 'winnerTextIntro')
-          .attr('x', 0)
+      // type is what type of result (pop, pres, house, senate)
+      function drawResult(type, svg) {
+        d3.select(svg).append('text')
+          .attr('class', 'winnerText ' + type + 'WinnerText')
+          .attr('x', result.w / 2)
           .attr('y', 15)
           .style('fill', 'green') // gets populated by update function
-          .text('test'); // gets populated by update function
-        svg.append('text')
-          .attr('class', 'resultTextIntro')
-          .attr('x', 0)
+          .text(''); // gets populated by update function
+        d3.select(svg).append('text')
+          .attr('class', 'resultText ' + type + 'ResultText')
+          .attr('x', result.w / 2)
           .attr('y', 32)
           .style('fill', 'green') // gets populated by update function
           .text(''); // gets populated by update function
       };
 
-      // drawResult();
-      // drawResult();
-      // drawResult();
-      // drawResult();
+      // draw results in intro section
+      drawResult('pop', '#introPopResult');
+      drawResult('pres', '#introPresResult');
+      drawResult('house', '#introHouseResult');
+      drawResult('senate', '#introSenateResult');
 
-      // drawResult();
-      // drawResult();
+      // draw results in pres section
+      drawResult('pop', '#presPopResult');
+      drawResult('pres', '#presPresResult');
 
-      // drawResult();
-      // drawResult();
+      // draw results in house section
+      drawResult('pop', '#housePopResult');
+      drawResult('house', '#houseHouseResult');
 
-      // drawResult();
-      // drawResult();
-
-
-
-
-      introPopWinner = introPopResultSvg
-        .append('text')
-        .attr('class', 'winnerTextIntro popWinnerText')
-        .attr('x', 0)
-        .attr('y', 15)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      introPresWinner = introPresResultSvg
-        .append('text')
-        .attr('class', 'winnerTextIntro presWinnerText')
-        .attr('x', 0)
-        .attr('y', 15)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      introHouseWinner = introHouseResultSvg
-        .append('text')
-        .attr('class', 'winnerTextIntro houseWinnerText')
-        .attr('x', 0)
-        .attr('y', 15)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      introSenateWinner = introSenateResultSvg
-        .append('text')
-        .attr('class', 'winnerTextIntro senateWinnerText')
-        .attr('x', 0)
-        .attr('y', 15)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-
-      // result numbers
-
-      introPopResult = introPopResultSvg
-        .append('text')
-        .attr('class', 'resultTextIntro popResultText')
-        .attr('x', 0)
-        .attr('y', 30)
-        .style('fill', 'green')
-        .text(''); // text gets populated by update function
-
-      introPresResult = introPresResultSvg
-        .append('text')
-        .attr('class', 'resultTextIntro presResultText')
-        .attr('x', 0)
-        .attr('y', 30)
-        .style('fill', 'green')
-        .text(''); // text gets populated by update function
-
-      introHouseResult = introHouseResultSvg
-        .append('text')
-        .attr('class', 'resultTextIntro houseResultText')
-        .attr('x', 0)
-        .attr('y', 30)
-        .style('fill', 'green')
-        .text(''); // text gets populated by update function
-
-      introSenateResult = introSenateResultSvg
-        .append('text')
-        .attr('class', 'resultTextIntro senateResultText')
-        .attr('x', 0)
-        .attr('y', 30)
-        .style('fill', 'green')
-        .text(''); // text gets populated by update function
-
-      // winner text
-
-      presPopWinner = presPopResultSvg
-        .append('text')
-        .attr('class', 'winnerText popWinnerText')
-        .attr('x', 181)
-        .attr('y', 20)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      presPresWinner = presPresResultSvg
-        .append('text')
-        .attr('class', 'winnerText presWinnerText')
-        .attr('x', 101)
-        .attr('y', 20)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-
-      housePopWinner = housePopResultSvg
-        .append('text')
-        .attr('class', 'winnerText popWinnerText')
-        .attr('x', 181)
-        .attr('y', 20)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      houseHouseWinner = houseHouseResultSvg
-        .append('text')
-        .attr('class', 'winnerText houseWinnerText')
-        .attr('x', 101)
-        .attr('y', 20)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-
-      senatePopWinner = senatePopResultSvg
-        .append('text')
-        .attr('class', 'winnerText popWinnerText')
-        .attr('x', 181)
-        .attr('y', 20)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      senateSenateWinner = senateSenateResultSvg
-        .append('text')
-        .attr('class', 'winnerText senateWinnerText')
-        .attr('x', 101)
-        .attr('y', 20)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-
-
-      presPopResult = presPopResultSvg
-        .append('text')
-        .attr('class', 'resultText popResultText')
-        .attr('x', 181)
-        .attr('y', 37)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      presPresResult = presPresResultSvg
-        .append('text')
-        .attr('class', 'resultText presResultText')
-        .attr('x', 101)
-        .attr('y', 37)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-
-      housePopResult = housePopResultSvg
-        .append('text')
-        .attr('class', 'resultText popResultText')
-        .attr('x', 181)
-        .attr('y', 37)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      houseHouseResult = houseHouseResultSvg
-        .append('text')
-        .attr('class', 'resultText houseResultText')
-        .attr('x', 101)
-        .attr('y', 37)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-
-      senatePopResult = senatePopResultSvg
-        .append('text')
-        .attr('class', 'resultText popResultText')
-        .attr('x', 181)
-        .attr('y', 37)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
-      
-      senateSenateResult = senateSenateResultSvg
-        .append('text')
-        .attr('class', 'resultText senateResultText')
-        .attr('x', 101)
-        .attr('y', 37)
-        .style('fill', 'green')
-        .text('test'); // text gets populated by update function
+      // draw results in senate section
+      drawResult('pop', '#senatePopResult');
+      drawResult('senate', '#senateSenateResult');
 
 
       // UPDATE DATA
@@ -736,11 +543,6 @@
       function update(section, vote) {
         // section is the section of the slider that was used (to just update charts in the appropriate section)
         // vote is the vote scenario selected in the slider
-
-        // // concatenate the appropriate svg ids
-        // const mapSvg = '#' + section + 'Map';
-        // const barSvg = '#' + section + 'Chart';
-
 
         // update colors of rects on bars and maps in the appropriate section
         d3.selectAll('.' + section + '.bar,.' + section + '.map').selectAll('rect')
@@ -771,6 +573,7 @@
             senateWinnerText, 
             senateResultText = '';
 
+        // popular vote majority is >0.5
         if (popResultR > 0.5) {
           popWinnerColor = red;
           popWinnerText = 'Republicans win popular vote';
@@ -785,6 +588,7 @@
           popResultText = d3.format(".1%")(1 - popResultR) + ' to ' + d3.format(".1%")(popResultR);
         };
 
+        // presidency majority is >269
         if (presResultR > 269) {
           presWinnerColor = red;
           presWinnerText = 'Republicans win presidency';
@@ -799,6 +603,7 @@
           presResultText = (538 - presResultR) + ' elec. votes to ' + (presResultR) + ' elec. votes';
         };
 
+        // house majority is >217
         if (houseResultR >= 218) {
           houseWinnerColor = red;
           houseWinnerText = 'Republicans win House';
@@ -809,6 +614,7 @@
           houseResultText = (435 - houseResultR) + ' seats to ' + (houseResultR) + ' seats';
         };
 
+        // senate majority is >50
         if (senateResultR > 50) {
           senateWinnerColor = red;
           senateWinnerText = 'Republicans win Senate';
@@ -822,9 +628,6 @@
           senateWinnerText = 'Even (vice president breaks tie)';
           senateResultText = (100 - senateResultR) + ' seats to ' + (senateResultR) + ' seats';
         };
-
-
-
 
         // update text, numbers, and colors of all the result messages in each section (may select nothing depending on the section)
 
@@ -856,284 +659,8 @@
           .text(senateResultText)
           .style('fill', senateWinnerColor);
 
+    	}; // end update function
 
-
-
-
-
-
-        // if (section == 'intro'){
-
-        //   // update result winner messages
-        //   introPopWinner.call(item => item
-        //     .text(popWinnerText)
-        //     .style('fill', popWinnerColor)
-        //     );
-        //   introPresWinner.call(item => item
-        //     .text(presWinnerText)
-        //     .style('fill', presWinnerColor)
-        //     );
-        //   introHouseWinner.call(item => item
-        //     .text(houseWinnerText)
-        //     .style('fill', houseWinnerColor)
-        //     );
-        //   introSenateWinner.call(item => item
-        //     .text(senateWinnerText)
-        //     .style('fill', senateWinnerColor)
-        //     );
-
-        //   // update result numbers (which number is first depends on winner)
-        //   introPopResult.call(item => item.text(function(){
-        //     if (popResultR > 0.5) {
-        //       return d3.format(".1%")(popResultR) + ' to ' + d3.format(".1%")(1 - popResultR);
-        //     } else {
-        //       return d3.format(".1%")(1 - popResultR) + ' to ' + d3.format(".1%")(popResultR);
-        //     } 
-        //   }).style('fill', function(){
-        //     if (popResultR > 0.5) {
-        //       return red;
-        //     } else if (popResultR < 0.5) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   introPresResult.call(item => item.text(function(){
-        //     if (presResultR > 269) {
-        //       return (presResultR) + ' EVs to ' + (538 - presResultR) + ' EVs';
-        //     } else {
-        //       return (538 - presResultR) + ' EVs to ' + (presResultR) + ' EVs';
-        //     }
-        //   }).style('fill', function(){
-        //     if (presResultR > 269) {
-        //       return red;
-        //     } else if (presResultR < 269) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   introHouseResult.call(item => item.text(function(){
-        //     if (houseResultR >= 218) {
-        //       return (houseResultR) + ' seats to ' + (435 - houseResultR) + ' seats';
-        //     } else {
-        //       return (435 - houseResultR) + ' seats to ' + (houseResultR) + ' seats';
-        //     }
-        //   }).style('fill', function(){
-        //     if (houseResultR >= 218) {
-        //       return red;
-        //     } else if (houseResultR < 218) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   introSenateResult.call(item => item.text(function(){
-        //     if (senateResultR > 50) {
-        //       return (senateResultR) + ' seats to ' + (100 - senateResultR) + ' seats';
-        //     } else {
-        //       return (100 - senateResultR) + ' seats to ' + (senateResultR) + ' seats';
-        //     }
-        //   }).style('fill', function(){
-        //     if (senateResultR > 50) {
-        //       return red;
-        //     } else if (senateResultR < 50) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-
-        // };
-
-        // if (section == 'pres'){
-
-        //   // update result winner messages
-        //   presPopWinner.call(item => item.text(function(){
-        //     return popWinnerText;
-        //   }).style('fill', function(){
-        //     if (popResultR > 0.5) {
-        //       return red;
-        //     } else if (popResultR < 0.5) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   presPresWinner.call(item => item.text(function(){
-        //     return presWinnerText;
-        //   }).style('fill', function(){
-        //     if (presResultR > 269) {
-        //       return red;
-        //     } else if (presResultR < 269) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-
-        //   // update result numbers (which number is first depends on winner)
-        //   presPopResult.call(item => item.text(function(){
-        //     if (popResultR > 0.5) {
-        //       return d3.format(".1%")(popResultR) + ' to ' + d3.format(".1%")(1 - popResultR);
-        //     } else {
-        //       return d3.format(".1%")(1 - popResultR) + ' to ' + d3.format(".1%")(popResultR);
-        //     } 
-        //   }).style('fill', function(){
-        //     if (popResultR > 0.5) {
-        //       return red;
-        //     } else if (popResultR < 0.5) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   presPresResult.call(item => item.text(function(){
-        //     if (presResultR > 269) {
-        //       return (presResultR) + ' EVs to ' + (538 - presResultR) + ' EVs';
-        //     } else {
-        //       return (538 - presResultR) + ' EVs to ' + (presResultR) + ' EVs';
-        //     }
-        //   }).style('fill', function(){
-        //     if (presResultR > 269) {
-        //       return red;
-        //     } else if (presResultR < 269) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-
-        // };
-
-        // if (section == 'house'){
-
-        //   // update result winner messages
-        //   housePopWinner.call(item => item.text(function(){
-        //     return popWinnerText;
-        //   }).style('fill', function(){
-        //     if (popResultR > 0.5) {
-        //       return red;
-        //     } else if (popResultR < 0.5) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   houseHouseWinner.call(item => item.text(function(){
-        //     return houseWinnerText;
-        //   }).style('fill', function(){
-        //     if (houseResultR >= 218) {
-        //       return red;
-        //     } else if (houseResultR < 218) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-
-        //   // update result numbers (which number is first depends on winner)
-        //   housePopResult.call(item => item.text(function(){
-        //     if (popResultR > 0.5) {
-        //       return d3.format(".1%")(popResultR) + ' to ' + d3.format(".1%")(1 - popResultR);
-        //     } else {
-        //       return d3.format(".1%")(1 - popResultR) + ' to ' + d3.format(".1%")(popResultR);
-        //     } 
-        //   }).style('fill', function(){
-        //     if (popResultR > 0.5) {
-        //       return red;
-        //     } else if (popResultR < 0.5) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   houseHouseResult.call(item => item.text(function(){
-        //     if (houseResultR >= 218) {
-        //       return (houseResultR) + ' seats to ' + (435 - houseResultR) + ' seats';
-        //     } else {
-        //       return (435 - houseResultR) + ' seats to ' + (houseResultR) + ' seats';
-        //     }
-        //   }).style('fill', function(){
-        //     if (houseResultR >= 218) {
-        //       return red;
-        //     } else if (houseResultR < 218) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        // };
-
-        // if (section == 'senate'){
-
-        //   // update result winner messages
-        //   senatePopWinner.call(item => item.text(function(){
-        //     return popWinnerText;
-        //   }).style('fill', function(){
-        //     if (popResultR > 0.5) {
-        //       return red;
-        //     } else if (popResultR < 0.5) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   senateSenateWinner.call(item => item.text(function(){
-        //     return senateWinnerText;
-        //   }).style('fill', function(){
-        //     if (senateResultR > 50) {
-        //       return red;
-        //     } else if (senateResultR < 50) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-
-        //   // update result numbers (which number is first depends on winner)
-        //   senatePopResult.call(item => item.text(function(){
-        //     if (popResultR > 0.5) {
-        //       return d3.format(".1%")(popResultR) + ' to ' + d3.format(".1%")(1 - popResultR);
-        //     } else {
-        //       return d3.format(".1%")(1 - popResultR) + ' to ' + d3.format(".1%")(popResultR);
-        //     } 
-        //   }).style('fill', function(){
-        //     if (popResultR > 0.5) {
-        //       return red;
-        //     } else if (popResultR < 0.5) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        //   senateSenateResult.call(item => item.text(function(){
-        //     if (senateResultR > 50) {
-        //       return (senateResultR) + ' seats to ' + (100 - senateResultR) + ' seats';
-        //     } else {
-        //       return (100 - senateResultR) + ' seats to ' + (senateResultR) + ' seats';
-        //     }
-        //   }).style('fill', function(){
-        //     if (senateResultR > 50) {
-        //       return red;
-        //     } else if (senateResultR < 50) {
-        //       return blue;
-        //     } else {
-        //       return gray;
-        //     }
-        //   }));
-        // };
-
-
-
-
-
-        // results.forEach(item => item.style('fill', d => {
-        //   return leanColor(+d.rlean + vote);
-        // }));
-
-
-    	};
 
       // initial results and colors (popular vote = 0)
       update('intro', 0);
