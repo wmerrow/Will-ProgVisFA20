@@ -307,9 +307,24 @@
   	  basemap('#houseMap');
   	  basemap('#senateMap');
 
-      // add squares for maps
+      // leader lines for crowded areas on map
 
-      presSquares = d3.select('#presMap').selectAll('rect')
+      // rhode island
+      d3.select('#presMap')
+        .append('line')
+        .attr('class', 'leaderLine')
+        .attr('x1', 0.916 * map.w + margin.left)
+        .attr('y1', 0.288 * map.h + margin.top)
+        .attr('x2', 0.945 * map.w + margin.left)
+        .attr('y2', 0.315 * map.h + margin.top);
+
+      // connecticut
+
+      // maryland
+
+
+      // president squares
+      d3.select('#presMap').selectAll('rect')
         .data(pres_data)
         .join('rect')
         // x and y position account for size of square in order to center square
@@ -319,7 +334,8 @@
         .attr('height', d=> presSize(+d.electors))
         .attr('class', 'rect');
 
-      houseSquares = d3.select('#houseMap').selectAll('rect')
+      // house squares
+      d3.select('#houseMap').selectAll('rect')
         .data(house_data)
         .join('rect')
         // position squares for each state, using state coordinates and then using modulo to create columns, with column size determined by the square root of the total districts in state, resulting in roughly square grids
@@ -329,7 +345,8 @@
         .attr('height', house_square.h)
 		    .attr('class', 'rect');	
 
-      senateSquares = d3.select('#senateMap').selectAll('rect')
+      // senate squares
+      d3.select('#senateMap').selectAll('rect')
         .data(senate_data)
         .join('rect')
         .attr('x', d=> +d.state_x * map.w + +d.offset_x * senate_square.w + margin.left)
@@ -337,6 +354,8 @@
         .attr('width', senate_square.w)
         .attr('height', senate_square.h)
         .attr('class', 'rect');
+
+
 
 
       // BAR CHARTS
