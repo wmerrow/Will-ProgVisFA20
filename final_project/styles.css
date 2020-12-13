@@ -69,8 +69,8 @@
         }
 
         .leaderLine {
-          stroke: #999999;
-          stroke-width: 0.5px; 
+          stroke: #aaaaaa;
+          stroke-width: 0.75px; 
         }
 
           /*svg{
